@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { QueryProvider } from "@/query/providers/QueryProvider";
 import { NavBar } from "@/components/NavBar";
 import { Header } from "@/components/Header";
+import { RestTimerBar } from "@/components/training/RestTimerBar";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -37,6 +38,7 @@ export default function RootLayout({
             <main className="min-h-0 flex-1 overflow-y-auto app-scroll">
               <div className="mx-auto w-full max-w-[900px]">{children}</div>
             </main>
+            <RestTimerBar />
             <NavBar />
           </div>
         </QueryProvider>
