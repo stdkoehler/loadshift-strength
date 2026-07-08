@@ -1,29 +1,37 @@
-import type { ProgressWeek } from '@/lib/types';
+'use client';
 
-const W = 640;
-const H = 220;
-const PAD_L = 40;
-const PAD_R = 12;
-const PAD_T = 14;
-const PAD_B = 26;
+import {
+  ResponsiveContainer,
+  LineChart as RLineChart,
+  Line,
+  BarChart as RBarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from 'recharts';
+import type { ProgressWeek } from '@/lib/types';
 
 const GRID = '#404040';
 const TEXT = '#737373';
 
-function scales(weeks: ProgressWeek[], maxVal: number) {
-  const n = weeks.length;
-  const x = (i: number) => PAD_L + (n <= 1 ? 0 : (i / (n - 1)) * (W - PAD_L - PAD_R));
-  const y = (v: number) => PAD_T + (1 - (maxVal ? v / maxVal : 0)) * (H - PAD_T - PAD_B);
-  return { x, y };
-}
+const LABELS: Record<string, string> = {
+  sollTop: 'Soll',
+  istTop: 'Ist',
+  volumeSoll: 'Soll',
+  volumeIst: 'Ist',
+};
 
-function niceMax(v: number): number {
-  if (v <= 0) return 10;
-  const pow = Math.pow(10, Math.floor(Math.log10(v)));
-  const n = v / pow;
-  const step = n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10;
-  return step * pow;
-}
+const tooltipContentStyle = {
+  background: '#171717',
+  border: '1px solid #404040',
+  borderRadius: 8,
+  fontSize: 12,
+};
+
+const tooltipLabelStyle = { color: '#a3a3a3' };
+const tooltipItemStyle = { color: '#e5e5e5' };
 
 export function LineChart({
   weeks,
@@ -32,43 +40,36 @@ export function LineChart({
   weeks: ProgressWeek[];
   series: { key: 'sollTop' | 'istTop'; color: string; dashed?: boolean }[];
 }) {
-  const allVals = series.flatMap((s) => weeks.map((w) => w[s.key]).filter((v): v is number => v != null));
-  const maxVal = niceMax(Math.max(1, ...allVals));
-  const { x, y } = scales(weeks, maxVal);
-  const ticks = [0, 0.5, 1].map((f) => maxVal * f);
-
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
-      {ticks.map((t, i) => (
-        <g key={i}>
-          <line x1={PAD_L} x2={W - PAD_R} y1={y(t)} y2={y(t)} stroke={GRID} strokeWidth={1} />
-          <text x={4} y={y(t) + 4} fill={TEXT} fontSize={11}>{Math.round(t)}</text>
-        </g>
-      ))}
-      {weeks.map((w, i) => (
-        <text key={i} x={x(i)} y={H - 8} fill={TEXT} fontSize={11} textAnchor="middle">{w.week}</text>
-      ))}
-      {series.map((s) => {
-        const pts = weeks
-          .map((w, i) => (w[s.key] != null ? `${x(i)},${y(w[s.key] as number)}` : null))
-          .filter(Boolean)
-          .join(' ');
-        return (
-          <g key={s.key}>
-            <polyline
-              points={pts}
-              fill="none"
-              stroke={s.color}
-              strokeWidth={2.5}
-              strokeDasharray={s.dashed ? '5 5' : 'none'}
-              strokeLinejoin="round"
-              strokeLinecap="round"
-            />
-            {weeks.map((w, i) => (w[s.key] != null ? <circle key={i} cx={x(i)} cy={y(w[s.key] as number)} r={3.5} fill={s.color} /> : null))}
-          </g>
-        );
-      })}
-    </svg>
+    <ResponsiveContainer width="100%" height={220}>
+      <RLineChart data={weeks} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+        <CartesianGrid stroke={GRID} vertical={false} />
+        <XAxis dataKey="week" tick={{ fill: TEXT, fontSize: 11 }} axisLine={{ stroke: GRID }} tickLine={false} />
+        <YAxis tick={{ fill: TEXT, fontSize: 11 }} axisLine={false} tickLine={false} width={40} />
+        <Tooltip
+          contentStyle={tooltipContentStyle}
+          labelStyle={tooltipLabelStyle}
+          itemStyle={tooltipItemStyle}
+          cursor={{ stroke: GRID }}
+          labelFormatter={(w) => `Woche ${w}`}
+        />
+        {series.map((s) => (
+          <Line
+            key={s.key}
+            type="monotone"
+            dataKey={s.key}
+            name={LABELS[s.key] ?? s.key}
+            stroke={s.color}
+            strokeWidth={2.5}
+            strokeDasharray={s.dashed ? '5 5' : undefined}
+            dot={{ r: 3.5, fill: s.color, strokeWidth: 0 }}
+            activeDot={{ r: 5 }}
+            connectNulls
+            isAnimationActive={false}
+          />
+        ))}
+      </RLineChart>
+    </ResponsiveContainer>
   );
 }
 
@@ -79,47 +80,32 @@ export function BarChart({
   weeks: ProgressWeek[];
   keys: { key: 'volumeSoll' | 'volumeIst'; color: string; soft?: boolean }[];
 }) {
-  const allVals = keys.flatMap((k) => weeks.map((w) => w[k.key] || 0));
-  const maxVal = niceMax(Math.max(1, ...allVals));
-  const n = weeks.length;
-  const groupW = (W - PAD_L - PAD_R) / n;
-  const barW = Math.min(14, (groupW - 6) / keys.length);
-  const y = (v: number) => PAD_T + (1 - (maxVal ? v / maxVal : 0)) * (H - PAD_T - PAD_B);
-  const ticks = [0, 0.5, 1].map((f) => maxVal * f);
-
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block' }}>
-      {ticks.map((t, i) => (
-        <g key={i}>
-          <line x1={PAD_L} x2={W - PAD_R} y1={y(t)} y2={y(t)} stroke={GRID} strokeWidth={1} />
-          <text x={4} y={y(t) + 4} fill={TEXT} fontSize={11}>{Math.round(t)}</text>
-        </g>
-      ))}
-      {weeks.map((w, i) => {
-        const cx = PAD_L + groupW * i + groupW / 2;
-        return (
-          <g key={i}>
-            {keys.map((k, ki) => {
-              const v = w[k.key] || 0;
-              const bx = cx - (keys.length * barW) / 2 + ki * barW;
-              const by = y(v);
-              return (
-                <rect
-                  key={k.key}
-                  x={bx}
-                  y={by}
-                  width={Math.max(0, barW - 2)}
-                  height={Math.max(0, y(0) - by)}
-                  rx={2}
-                  fill={k.color}
-                  opacity={k.soft ? 0.45 : 1}
-                />
-              );
-            })}
-            <text x={cx} y={H - 8} fill={TEXT} fontSize={11} textAnchor="middle">{w.week}</text>
-          </g>
-        );
-      })}
-    </svg>
+    <ResponsiveContainer width="100%" height={220}>
+      <RBarChart data={weeks} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+        <CartesianGrid stroke={GRID} vertical={false} />
+        <XAxis dataKey="week" tick={{ fill: TEXT, fontSize: 11 }} axisLine={{ stroke: GRID }} tickLine={false} />
+        <YAxis tick={{ fill: TEXT, fontSize: 11 }} axisLine={false} tickLine={false} width={40} />
+        <Tooltip
+          contentStyle={tooltipContentStyle}
+          labelStyle={tooltipLabelStyle}
+          itemStyle={tooltipItemStyle}
+          cursor={{ fill: 'rgba(255,255,255,0.04)' }}
+          labelFormatter={(w) => `Woche ${w}`}
+        />
+        {keys.map((k) => (
+          <Bar
+            key={k.key}
+            dataKey={k.key}
+            name={LABELS[k.key] ?? k.key}
+            fill={k.color}
+            fillOpacity={k.soft ? 0.45 : 1}
+            radius={[2, 2, 0, 0]}
+            maxBarSize={18}
+            isAnimationActive={false}
+          />
+        ))}
+      </RBarChart>
+    </ResponsiveContainer>
   );
 }
