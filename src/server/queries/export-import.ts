@@ -41,7 +41,9 @@ export async function exportCycle(cycleId: number, includeLogs: boolean): Promis
     exportedAt: new Date().toISOString(),
     cycle: {
       name: full.cycle.name,
-      startDate: full.cycle.startDate,
+      // Templates have no start date - callers that export a template (loadTemplateAction)
+      // always overwrite this with a real date before the payload is used anywhere.
+      startDate: full.cycle.startDate ?? '',
       lengthWeeks: full.cycle.lengthWeeks,
       waveLengthWeeks: full.cycle.waveLengthWeeks,
     },

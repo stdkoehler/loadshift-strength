@@ -7,14 +7,14 @@ import type { Cycle } from '@/lib/types';
 
 export function CycleSettingsModal({ cycle, onClose, onSaved }: { cycle: Cycle; onClose: () => void; onSaved: () => void }) {
   const [name, setName] = useState(cycle.name);
-  const [startDate, setStartDate] = useState(cycle.startDate);
+  const [startDate, setStartDate] = useState(cycle.startDate ?? '');
   const [length, setLength] = useState(String(cycle.lengthWeeks));
   const [waveLength, setWaveLength] = useState(cycle.waveLengthWeeks != null ? String(cycle.waveLengthWeeks) : '');
 
   const save = async () => {
     await updateCycleAction(cycle.id, {
       name: name.trim(),
-      startDate,
+      ...(cycle.isTemplate ? {} : { startDate }),
       lengthWeeks: Number(length),
       waveLengthWeeks: waveLength.trim() === '' ? null : Number(waveLength),
     });
@@ -41,10 +41,12 @@ export function CycleSettingsModal({ cycle, onClose, onSaved }: { cycle: Cycle; 
         <label className={labelClass}>Name</label>
         <input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} />
       </div>
-      <div>
-        <label className={labelClass}>Startdatum (Montag Woche 1)</label>
-        <input type="date" className={inputClass} value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-      </div>
+      {!cycle.isTemplate && (
+        <div>
+          <label className={labelClass}>Startdatum (Montag Woche 1)</label>
+          <input type="date" className={inputClass} value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+        </div>
+      )}
       <div>
         <label className={labelClass}>Laenge (Wochen)</label>
         <input inputMode="numeric" className={inputClass} value={length} onChange={(e) => setLength(e.target.value)} />

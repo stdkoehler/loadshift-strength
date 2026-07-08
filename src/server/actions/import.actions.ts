@@ -7,7 +7,10 @@ import { weekNumberFor } from '@/lib/progression';
 import { EXPORT_FORMAT } from '@/lib/types';
 import { importPayloadSchema } from '@/zod/import.schema';
 
-export async function importCycleAction(input: unknown, { activate = true }: { activate?: boolean } = {}) {
+export async function importCycleAction(
+  input: unknown,
+  { activate = true, isTemplate = false }: { activate?: boolean; isTemplate?: boolean } = {}
+) {
   if (!input || typeof input !== 'object' || (input as { format?: unknown }).format !== EXPORT_FORMAT) {
     throw new Error('Ungueltiges Plan-Format');
   }
@@ -18,9 +21,10 @@ export async function importCycleAction(input: unknown, { activate = true }: { a
       .insert(cycles)
       .values({
         name: data.cycle.name || 'Importierter Zyklus',
-        startDate: data.cycle.startDate,
+        startDate: isTemplate ? null : data.cycle.startDate,
         lengthWeeks: data.cycle.lengthWeeks || 8,
         waveLengthWeeks: data.cycle.waveLengthWeeks ?? null,
+        isTemplate,
       })
       .returning({ id: cycles.id })
       .get().id;
@@ -100,7 +104,7 @@ export async function importCycleAction(input: unknown, { activate = true }: { a
       exercisesByWeekday.set(d.weekday, exIds);
     });
 
-    if (Array.isArray(data.logs)) {
+    if (Array.isArray(data.logs) && !isTemplate) {
       for (const l of data.logs) {
         const exId = (exercisesByWeekday.get(l.dayWeekday) || [])[l.exerciseIndex];
         if (!exId || !l.date) continue;
@@ -121,7 +125,7 @@ export async function importCycleAction(input: unknown, { activate = true }: { a
       }
     }
 
-    if (activate) {
+    if (activate && !isTemplate) {
       tx.update(cycles).set({ isActive: false }).run();
       tx.update(cycles).set({ isActive: true }).where(eq(cycles.id, newCycleId)).run();
     }

@@ -22,6 +22,13 @@
       "when": 1783453204606,
       "tag": "0002_magenta_vivisector",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1783543051230,
+      "tag": "0003_dapper_absorbing_man",
+      "breakpoints": true
     }
   ]
 }

@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { IconDumbbell, IconCalendar, IconChart } from '@/components/ui/Icons';
+import { IconDumbbell, IconCalendar, IconChart, IconHistory } from '@/components/ui/Icons';
 
 const TABS = [
   { href: '/training', label: 'Training', Icon: IconDumbbell },
   { href: '/plan', label: 'Plan', Icon: IconCalendar },
   { href: '/progress', label: 'Fortschritt', Icon: IconChart },
+  { href: '/verlauf', label: 'Verlauf', Icon: IconHistory },
 ];
 
 export function NavBar() {

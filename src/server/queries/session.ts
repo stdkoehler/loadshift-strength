@@ -8,7 +8,7 @@ import { getCycle, getPhases } from './cycles';
 
 export async function getSessionForDate(cycleId: number, dateIso: string): Promise<SessionForDate | null> {
   const cycle = await getCycle(cycleId);
-  if (!cycle) return null;
+  if (!cycle || !cycle.startDate) return null;
 
   const phaseRows = await getPhases(cycleId);
   const week = weekNumberFor(cycle.startDate, dateIso);
@@ -51,16 +51,22 @@ export async function getSessionForDate(cycleId: number, dateIso: string): Promi
       const log = logMap.get(`${ex.id}:${s.setIndex}`) ?? null;
       const actualWeight = log?.actualWeight ?? null;
       const actualReps = log?.actualReps ?? null;
-      const usedWeight = actualWeight ?? weight;
-      const usedReps = actualReps ?? reps;
+      // Once a set has been logged, its planned values are frozen in the log row
+      // (soll* columns) so history stays accurate even if the exercise's targets are
+      // edited later. Unlogged sets keep showing the live, currently-computed target.
+      const usedSollReps = log?.sollReps ?? reps;
+      const usedSollWeight = log?.sollWeight ?? weight;
+      const usedSollRir = log?.sollRir ?? rir;
+      const usedWeight = actualWeight ?? usedSollWeight;
+      const usedReps = actualReps ?? usedSollReps;
       const volume = (usedWeight || 0) * (usedReps || 0);
       dayVolume += volume;
       return {
         setIndex: s.setIndex,
         role: s.role,
-        sollReps: reps,
-        sollWeight: weight,
-        sollRir: rir,
+        sollReps: usedSollReps,
+        sollWeight: usedSollWeight,
+        sollRir: usedSollRir,
         istReps: actualReps,
         istWeight: actualWeight,
         done: log ? log.done : false,

@@ -72,6 +72,41 @@ export interface ProgressResult {
   weeks: ProgressWeek[];
 }
 
+// ---------- history (calendar-date tracking, independent of the active plan) ----------
+
+export interface HistorySetEntry {
+  exerciseId: number;
+  exerciseName: string;
+  setIndex: number;
+  sollReps: number | null;
+  sollWeight: number | null;
+  sollRir: number | null;
+  istReps: number | null;
+  istWeight: number | null;
+  done: boolean;
+}
+
+export interface HistoryDay {
+  date: string;
+  cycleId: number;
+  cycleName: string;
+  sets: HistorySetEntry[];
+}
+
+export interface ExerciseHistoryPoint {
+  date: string;
+  cycleName: string;
+  sollTop: number | null;
+  istTop: number | null;
+  volumeSoll: number;
+  volumeIst: number;
+}
+
+export interface ExerciseHistoryResult {
+  exerciseName: string;
+  points: ExerciseHistoryPoint[];
+}
+
 // ---------- portable export/import JSON shape ----------
 
 export const EXPORT_FORMAT = 'workout-plan-export';

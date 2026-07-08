@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { upsertLogAction } from '@/server/actions/logs.actions';
 import { queryKeys } from '@/query/keys';
-import { fmt } from '@/lib/date';
+import { fmt, todayIso } from '@/lib/date';
 import { toggleDone } from './toggle-done';
 import type { SessionSet } from '@/lib/types';
 
@@ -26,6 +26,7 @@ function RoleChip({ role }: { role: string | null }) {
 
 export function SetRow({ exerciseId, date, set }: { exerciseId: number; date: string; set: SessionSet }) {
   const queryClient = useQueryClient();
+  const editable = date === todayIso();
   const [reps, setReps] = useState(set.istReps != null ? String(set.istReps) : '');
   const [weight, setWeight] = useState(set.istWeight != null ? String(set.istWeight) : '');
   const [done, setDone] = useState(set.done);
@@ -75,24 +76,27 @@ export function SetRow({ exerciseId, date, set }: { exerciseId: number; date: st
           inputMode="numeric"
           placeholder={set.sollReps != null ? String(set.sollReps) : 'Wdh'}
           value={reps}
+          disabled={!editable}
           onChange={(e) => setReps(e.target.value)}
           onBlur={() => void save(reps, weight, done)}
-          className="w-14 rounded-md border border-neutral-700 bg-neutral-800 px-2 py-1 text-center text-sm text-neutral-100"
+          className="w-14 rounded-md border border-neutral-700 bg-neutral-800 px-2 py-1 text-center text-sm text-neutral-100 disabled:opacity-60"
         />
         <span className="text-neutral-600">×</span>
         <input
           inputMode="decimal"
           placeholder={set.sollWeight != null ? fmt(set.sollWeight) : 'kg'}
           value={weight}
+          disabled={!editable}
           onChange={(e) => setWeight(e.target.value)}
           onBlur={() => void save(reps, weight, done)}
-          className="w-16 rounded-md border border-neutral-700 bg-neutral-800 px-2 py-1 text-center text-sm text-neutral-100"
+          className="w-16 rounded-md border border-neutral-700 bg-neutral-800 px-2 py-1 text-center text-sm text-neutral-100 disabled:opacity-60"
         />
         <button
           type="button"
           aria-label="erledigt"
           onClick={handleToggle}
-          className={`flex h-8 w-8 items-center justify-center rounded-full border transition-colors ${
+          disabled={!editable}
+          className={`flex h-8 w-8 items-center justify-center rounded-full border transition-colors disabled:opacity-60 ${
             done ? 'border-emerald-500 bg-emerald-500 text-neutral-950' : 'border-neutral-600 text-neutral-500'
           }`}
         >

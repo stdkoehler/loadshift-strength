@@ -44,7 +44,8 @@ export function ProgressView() {
             <h4 className="text-sm font-semibold text-neutral-100">Arbeitsgewicht (Top-Satz)</h4>
             <p className="mb-2 text-xs text-neutral-500">Soll vs. tatsaechlich geloggt, kg pro Woche</p>
             <LineChart
-              weeks={data.weeks}
+              data={data.weeks}
+              xKey="week"
               series={[
                 { key: 'sollTop', color: SOLL_COLOR, dashed: true },
                 { key: 'istTop', color: IST_COLOR },
@@ -60,7 +61,8 @@ export function ProgressView() {
             <h4 className="text-sm font-semibold text-neutral-100">Volumen</h4>
             <p className="mb-2 text-xs text-neutral-500">kg (Saetze × Wdh × Gewicht) pro Woche</p>
             <BarChart
-              weeks={data.weeks}
+              data={data.weeks}
+              xKey="week"
               keys={[
                 { key: 'volumeSoll', color: SOLL_COLOR, soft: true },
                 { key: 'volumeIst', color: IST_COLOR },

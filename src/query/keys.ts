@@ -4,4 +4,8 @@ export const queryKeys = {
   plan: (cycleId: number) => ['plan', cycleId] as const,
   progressList: () => ['progress-list'] as const,
   progress: (exerciseId: number) => ['progress', exerciseId] as const,
+  templates: () => ['templates'] as const,
+  historyDays: (from: string, to: string) => ['history-days', from, to] as const,
+  historyExerciseNames: () => ['history-exercise-names'] as const,
+  historyExercise: (name: string, from: string, to: string) => ['history-exercise', name, from, to] as const,
 };

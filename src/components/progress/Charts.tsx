@@ -11,7 +11,6 @@ import {
   CartesianGrid,
   Tooltip,
 } from 'recharts';
-import type { ProgressWeek } from '@/lib/types';
 
 const GRID = '#404040';
 const TEXT = '#737373';
@@ -33,25 +32,33 @@ const tooltipContentStyle = {
 const tooltipLabelStyle = { color: '#a3a3a3' };
 const tooltipItemStyle = { color: '#e5e5e5' };
 
-export function LineChart({
-  weeks,
+// Datum-keyed data (Verlauf) shows the ISO date as-is; week-keyed data (Fortschritt)
+// prefixes it with "Woche".
+function labelFor(xKey: string, value: unknown) {
+  return xKey === 'week' ? `Woche ${value}` : String(value);
+}
+
+export function LineChart<T extends object>({
+  data,
+  xKey = 'week',
   series,
 }: {
-  weeks: ProgressWeek[];
-  series: { key: 'sollTop' | 'istTop'; color: string; dashed?: boolean }[];
+  data: T[];
+  xKey?: string;
+  series: { key: string; color: string; dashed?: boolean }[];
 }) {
   return (
     <ResponsiveContainer width="100%" height={220}>
-      <RLineChart data={weeks} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+      <RLineChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
         <CartesianGrid stroke={GRID} vertical={false} />
-        <XAxis dataKey="week" tick={{ fill: TEXT, fontSize: 11 }} axisLine={{ stroke: GRID }} tickLine={false} />
+        <XAxis dataKey={xKey} tick={{ fill: TEXT, fontSize: 11 }} axisLine={{ stroke: GRID }} tickLine={false} />
         <YAxis tick={{ fill: TEXT, fontSize: 11 }} axisLine={false} tickLine={false} width={40} />
         <Tooltip
           contentStyle={tooltipContentStyle}
           labelStyle={tooltipLabelStyle}
           itemStyle={tooltipItemStyle}
           cursor={{ stroke: GRID }}
-          labelFormatter={(w) => `Woche ${w}`}
+          labelFormatter={(v) => labelFor(xKey, v)}
         />
         {series.map((s) => (
           <Line
@@ -73,25 +80,27 @@ export function LineChart({
   );
 }
 
-export function BarChart({
-  weeks,
+export function BarChart<T extends object>({
+  data,
+  xKey = 'week',
   keys,
 }: {
-  weeks: ProgressWeek[];
-  keys: { key: 'volumeSoll' | 'volumeIst'; color: string; soft?: boolean }[];
+  data: T[];
+  xKey?: string;
+  keys: { key: string; color: string; soft?: boolean }[];
 }) {
   return (
     <ResponsiveContainer width="100%" height={220}>
-      <RBarChart data={weeks} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+      <RBarChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
         <CartesianGrid stroke={GRID} vertical={false} />
-        <XAxis dataKey="week" tick={{ fill: TEXT, fontSize: 11 }} axisLine={{ stroke: GRID }} tickLine={false} />
+        <XAxis dataKey={xKey} tick={{ fill: TEXT, fontSize: 11 }} axisLine={{ stroke: GRID }} tickLine={false} />
         <YAxis tick={{ fill: TEXT, fontSize: 11 }} axisLine={false} tickLine={false} width={40} />
         <Tooltip
           contentStyle={tooltipContentStyle}
           labelStyle={tooltipLabelStyle}
           itemStyle={tooltipItemStyle}
           cursor={{ fill: 'rgba(255,255,255,0.04)' }}
-          labelFormatter={(w) => `Woche ${w}`}
+          labelFormatter={(v) => labelFor(xKey, v)}
         />
         {keys.map((k) => (
           <Bar

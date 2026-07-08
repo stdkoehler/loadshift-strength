@@ -5,12 +5,18 @@ import { integer, real, sqliteTable, text, unique } from 'drizzle-orm/sqlite-cor
 export const cycles = sqliteTable('cycles', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
-  startDate: text('start_date').notNull(),
+  // Null for templates - a template has no calendar placement, only a loaded
+  // instance (isTemplate: false) does.
+  startDate: text('start_date'),
   lengthWeeks: integer('length_weeks').notNull().default(8),
   // If set, phasen-progression targets repeat every N weeks instead of running once
   // linearly across the whole cycle (see effectiveWeek() in lib/progression.ts).
   waveLengthWeeks: integer('wave_length_weeks'),
   isActive: integer('is_active', { mode: 'boolean' }).notNull().default(false),
+  // A template is reusable structure (days/exercises/sets/phases) with no start date
+  // and never logged against directly. "Loading" a template deep-copies it into a new,
+  // dated, non-template cycle - see server/actions/templates.actions.ts.
+  isTemplate: integer('is_template', { mode: 'boolean' }).notNull().default(false),
   createdAt: text('created_at').notNull().default(sql`(datetime('now'))`),
 });
 
@@ -77,6 +83,11 @@ export const logs = sqliteTable('logs', {
   actualReps: integer('actual_reps'),
   actualWeight: real('actual_weight'),
   done: integer('done', { mode: 'boolean' }).notNull().default(false),
+  // Snapshot of the planned (soll) values at the moment this row was written, so a
+  // day's history stays accurate even if the exercise's targets are edited later.
+  sollReps: integer('soll_reps'),
+  sollWeight: real('soll_weight'),
+  sollRir: real('soll_rir'),
 }, (t) => [unique('logs_exercise_set_date_unique').on(t.exerciseId, t.setIndex, t.logDate)]);
 
 // ---------- relations (for the relational query API: db.query.x.findMany({ with: {...} })) ----------

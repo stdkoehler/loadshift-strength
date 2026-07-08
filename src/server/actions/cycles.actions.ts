@@ -3,7 +3,7 @@
 import { eq } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { cycles } from '@/db/schema';
-import { getCycle } from '@/server/queries/cycles';
+import { cycleHasLogs, getCycle } from '@/server/queries/cycles';
 import { cycleInputSchema, cycleUpdateSchema } from '@/zod/cycle.schema';
 
 export async function createCycleAction(input: unknown) {
@@ -37,11 +37,20 @@ export async function updateCycleAction(id: number, input: unknown) {
 }
 
 export async function deleteCycleAction(id: number) {
+  // Any cycle with at least one log is permanent history (see the Verlauf tab) - never
+  // let it cascade-delete via a plan cleanup. Templates never have logs against them
+  // directly, so this only ever blocks deleting a loaded/run plan instance.
+  if (await cycleHasLogs(id)) {
+    throw new Error('Dieser Plan hat bereits geloggte Trainingstage und kann nicht geloescht werden.');
+  }
   await db.delete(cycles).where(eq(cycles.id, id));
   return { ok: true };
 }
 
 export async function activateCycleAction(id: number) {
+  const cycle = await getCycle(id);
+  if (!cycle) throw new Error('Zyklus nicht gefunden');
+  if (cycle.isTemplate) throw new Error('Eine Vorlage kann nicht direkt aktiviert werden - erst laden.');
   db.transaction((tx) => {
     tx.update(cycles).set({ isActive: false }).run();
     tx.update(cycles).set({ isActive: true }).where(eq(cycles.id, id)).run();
