@@ -1,0 +1,1 @@
+ALTER TABLE `set_targets` ADD `increment_per_repeat` real DEFAULT 0 NOT NULL;

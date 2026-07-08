@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Workout Tracker — Next.js reference build
 
-## Getting Started
+A from-scratch reimplementation of the [`server/`](../server) workout tracker on a modern stack, built as a
+learning reference. Same domain (calendar-based training sessions, periodized/ramp progression, plan editor,
+JSON export/import), different tooling:
 
-First, run the development server:
+- **Next.js 16** (App Router, single Node process, self-hosted — no Vercel-specific features used)
+- **Zustand** for client-only UI state (selected date, which modal is open)
+- **SQLite** via **better-sqlite3**, same as the original app — still the simplest fit for a single-user,
+  self-hosted deployment
+- **Drizzle ORM** + `drizzle-kit` migrations instead of hand-written SQL strings
+- **Zod** for validating Server Action inputs
+- **Server Actions** for all mutations; Route Handlers (`force-dynamic`, `no-store`) for reads consumed by
+  **TanStack Query** — kept deliberately separate so reads never get bitten by Next's default caching
+- **Tailwind CSS** for the dark, gym-optimized theme
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Project layout
+
+```
+src/
+  db/            Drizzle schema, better-sqlite3 client, migration runner
+  lib/           Pure logic: progression math, date helpers, shared types
+  server/
+    queries/     Read-only Drizzle queries (session, plan, progress, export)
+    actions/     'use server' mutations (cycles, phases, days, exercises, logs, import)
+  zod/           Validation schemas for action inputs
+  stores/        Zustand UI store
+  query/         TanStack Query client/keys/hooks
+  components/    Training / Plan / Progress view components
+  app/           Routes: /training, /plan, /progress, /api/*
+proxy.ts         HTTP Basic Auth gate (Next's replacement for middleware.ts)
+docker/          Runtime migration script + container entrypoint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+cp .env.example .env.local   # set APP_USER / APP_PASSWORD
+npm run db:migrate           # creates ./data/workout.sqlite
+npm run dev                  # http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Database & Drizzle Workflow
 
-## Learn More
+Drizzle tracks schema changes via `src/db/schema.ts`. **Migrations do not run automatically on server boot** during local development to prevent unintended overrides. Use the following commands depending on your task:
 
-To learn more about Next.js, take a look at the following resources:
+**First-time Setup:**
+```bash
+npm run db:migrate           # Applies existing migrations and creates ./data/workout.sqlite
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Rapid Prototyping (Local Dev Only):**
+If you are iterating quickly on the schema and don't want to clutter your git history with tiny migration files, push schema changes directly to your local SQLite file:
+```bash
+npx drizzle-kit push
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Production-Ready Migrations (When changes are finalized):**
+When you are ready to commit your schema changes to the repository history, generate a formal migration script:
+```bash
+npx drizzle-kit generate     # Compares schema.ts against snapshots and creates a new .sql changelog
+npm run db:migrate           # Applies the newly generated script locally
+```
 
-## Deploy on Vercel
+**Database GUI:**
+To visually inspect your tables, relationships, and raw data in a local web browser interface:
+```bash
+npx drizzle-kit studio
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Clean slate:**
+```bash
+rm data/workout.sqlite
+rm -rf drizzle
+npx drizzle-kit generate
+npm run db:migrate
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Tests
+
+```bash
+npm test          # Vitest: progression math, editor state derivation, checkbox logic
+npx tsc --noEmit   # typecheck
+```
+
+## Docker (single container, matches the original app's deployment model)
+
+```bash
+cp .env.example .env
+docker compose up -d --build
+```
+
+Serves on `http://<host>:8090`, gated by HTTP Basic Auth (`APP_USER`/`APP_PASSWORD`). SQLite data persists in
+`./data` via a bind mount. Migrations run automatically on container start, before the server boots.
+
+Note: `better-sqlite3` has no prebuilt musl binary for Alpine, so the build stage compiles it from source
+(`python3 make g++` installed just for that stage — the runtime image stays slim).

@@ -1,0 +1,9 @@
+services:
+  workout-next:
+    build: .
+    ports: ["8090:3000"]
+    environment:
+      - APP_USER=${APP_USER}
+      - APP_PASSWORD=${APP_PASSWORD}
+    volumes: ["./data:/app/data"]
+    restart: unless-stopped
