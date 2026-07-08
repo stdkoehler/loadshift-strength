@@ -30,11 +30,13 @@ export default function RootLayout({
       lang="de"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col bg-neutral-950 text-neutral-100">
+      <body className="h-dvh overflow-hidden flex flex-col bg-neutral-950 text-neutral-100">
         <QueryProvider>
-          <div className="flex min-h-full flex-1 flex-col">
+          <div className="flex h-full min-h-0 flex-1 flex-col">
             <Header />
-            <main className="mx-auto w-full max-w-[900px] flex-1">{children}</main>
+            <main className="min-h-0 flex-1 overflow-y-auto app-scroll">
+              <div className="mx-auto w-full max-w-[900px]">{children}</div>
+            </main>
             <NavBar />
           </div>
         </QueryProvider>

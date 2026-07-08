@@ -115,7 +115,7 @@ export function ExerciseEditor({
         <label className={labelClass}>Notizen</label>
         <textarea
           rows={3}
-          className={inputClass}
+          className={`${inputClass} app-scroll resize-none`}
           value={st.notes}
           onChange={(e) => patch({ notes: e.target.value })}
           placeholder="z.B. Hinweise zur Ausfuehrung, Begruendung fuer Gewichtsanpassungen, ..."

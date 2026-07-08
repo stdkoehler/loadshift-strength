@@ -4,3 +4,36 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
+
+/* Firefox has no ::-webkit-scrollbar support, so it gets the standard
+   properties. Chromium/Safari support both, and (in modern versions)
+   let scrollbar-width/scrollbar-color silently win over the pseudo-
+   elements below, wiping out the custom width and gradient — so keep
+   the standard properties scoped away from browsers that support
+   ::-webkit-scrollbar. */
+@supports not selector(::-webkit-scrollbar) {
+  .app-scroll {
+    scrollbar-color: #10b981 transparent;
+    scrollbar-width: thin;
+  }
+}
+
+.app-scroll::-webkit-scrollbar {
+  width: 12px;
+}
+
+.app-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.app-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #34d399 0%, #10b981 45%, #065f46 100%);
+  border-radius: 9999px;
+  border: 2px solid #0a0a0a;
+  background-clip: padding-box;
+}
+
+.app-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #6ee7b7 0%, #10b981 45%, #047857 100%);
+  background-clip: padding-box;
+}

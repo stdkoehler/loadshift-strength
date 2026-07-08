@@ -41,7 +41,7 @@ export function Modal({
             <IconClose width={18} height={18} />
           </button>
         </div>
-        <div className="flex flex-col gap-4 overflow-y-auto px-4 py-4">{children}</div>
+        <div className="app-scroll flex flex-col gap-4 overflow-y-auto px-4 py-4">{children}</div>
         {footer && <div className="flex items-center gap-2 border-t border-neutral-800 px-4 py-3">{footer}</div>}
       </div>
     </div>
