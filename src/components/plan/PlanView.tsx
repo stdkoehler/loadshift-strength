@@ -3,7 +3,8 @@
 import { useActiveCycle } from '@/query/hooks/useActiveCycle';
 import { useUiStore } from '@/stores/ui-store';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { PlanEditor } from './PlanEditor';
+import { LivePlanEditor } from './LivePlanEditor';
+import { TemplateDraftEditor } from './TemplateDraftEditor';
 import { TemplatesModal, LoadTemplatePrompt } from './TemplatesModal';
 import { SaveAsTemplateModal } from './SaveAsTemplateModal';
 import { IconBookmark } from '@/components/ui/Icons';
@@ -16,21 +17,7 @@ export function PlanView() {
   const setTemplateEditingId = useUiStore((s) => s.setTemplateEditingId);
 
   if (templateEditingId != null) {
-    return (
-      <PlanEditor
-        cycleId={templateEditingId}
-        allowImportExport={false}
-        headerExtra={
-          <button
-            type="button"
-            onClick={() => setTemplateEditingId(null)}
-            className="ml-1 rounded-md border border-neutral-700 px-2 py-1 text-xs text-neutral-300"
-          >
-            Zurueck
-          </button>
-        }
-      />
-    );
+    return <TemplateDraftEditor cycleId={templateEditingId} onExit={() => setTemplateEditingId(null)} />;
   }
 
   if (cycle === null) return <EmptyState />;
@@ -38,7 +25,7 @@ export function PlanView() {
 
   return (
     <>
-      <PlanEditor
+      <LivePlanEditor
         cycleId={cycle.id}
         headerExtra={
           <>

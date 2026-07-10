@@ -2,23 +2,30 @@
 
 import { useState } from 'react';
 import { Modal } from '@/components/ui/Modal';
-import { updateCycleAction } from '@/server/actions/cycles.actions';
 import type { Cycle } from '@/lib/types';
+import type { CyclePayload } from './plan-editor-types';
 
-export function CycleSettingsModal({ cycle, onClose, onSaved }: { cycle: Cycle; onClose: () => void; onSaved: () => void }) {
+export function CycleSettingsModal({
+  cycle,
+  onClose,
+  onSave,
+}: {
+  cycle: Cycle;
+  onClose: () => void;
+  onSave: (payload: CyclePayload) => Promise<void> | void;
+}) {
   const [name, setName] = useState(cycle.name);
   const [startDate, setStartDate] = useState(cycle.startDate ?? '');
   const [length, setLength] = useState(String(cycle.lengthWeeks));
   const [waveLength, setWaveLength] = useState(cycle.waveLengthWeeks != null ? String(cycle.waveLengthWeeks) : '');
 
   const save = async () => {
-    await updateCycleAction(cycle.id, {
+    await onSave({
       name: name.trim(),
       ...(cycle.isTemplate ? {} : { startDate }),
       lengthWeeks: Number(length),
       waveLengthWeeks: waveLength.trim() === '' ? null : Number(waveLength),
     });
-    onSaved();
   };
 
   const footer = (

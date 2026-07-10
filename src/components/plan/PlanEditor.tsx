@@ -1,12 +1,8 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { usePlan } from '@/query/hooks/usePlan';
-import { queryKeys } from '@/query/keys';
 import { useUiStore } from '@/stores/ui-store';
 import { fmt } from '@/lib/date';
-import { deleteExerciseAction, createExerciseAction, updateExerciseAction } from '@/server/actions/exercises.actions';
 import { ExerciseEditor } from './ExerciseEditor/ExerciseEditor';
 import { CycleSettingsModal } from './CycleSettingsModal';
 import { PhasesEditorModal } from './PhasesEditorModal';
@@ -14,8 +10,9 @@ import { DayEditorModal } from './DayEditorModal';
 import { ExportModal } from './ExportModal';
 import { ImportButton } from './ImportButton';
 import { IconSettings, IconDownload, IconEdit, IconPlus } from '@/components/ui/Icons';
-import type { ExerciseWithSets } from '@/lib/types';
+import type { Day, ExerciseWithSets, FullPlan, Phase } from '@/lib/types';
 import type { ExerciseInput } from '@/zod/exercise.schema';
+import type { CyclePayload, DayPayload, PhasePayload } from './plan-editor-types';
 
 const WD: Record<number, string> = { 1: 'Montag', 2: 'Dienstag', 3: 'Mittwoch', 4: 'Donnerstag', 5: 'Freitag', 6: 'Samstag', 7: 'Sonntag' };
 
@@ -35,45 +32,49 @@ function exSummary(ex: ExerciseWithSets): string {
 }
 
 /**
- * Renders the day/exercise editor for a single cycle - either the active plan or a
- * template being edited (see PlanView, which picks which cycleId to pass in).
+ * Renders the day/exercise editor for a single cycle - either the active plan
+ * (LivePlanEditor, instant-save) or a template being edited (TemplateDraftEditor,
+ * local draft with explicit save/discard). This component only renders and delegates
+ * every mutation to its callback props - it holds no opinion on persistence.
  */
 export function PlanEditor({
-  cycleId,
+  plan,
   headerExtra,
   allowImportExport = true,
+  onSaveExercise,
+  onDeleteExercise,
+  onSaveDay,
+  onDeleteDay,
+  onSaveCycle,
+  onSavePhaseRow,
+  onAddPhaseRow,
+  onDeletePhaseRow,
 }: {
-  cycleId: number;
+  plan: FullPlan;
   headerExtra?: ReactNode;
   allowImportExport?: boolean;
+  onSaveExercise: (dayId: number, exerciseId: number | undefined, payload: ExerciseInput) => Promise<void> | void;
+  onDeleteExercise: (exerciseId: number) => Promise<void> | void;
+  onSaveDay: (day: Day | null, payload: DayPayload) => Promise<void> | void;
+  onDeleteDay: (day: Day) => Promise<void> | void;
+  onSaveCycle: (payload: CyclePayload) => Promise<void> | void;
+  onSavePhaseRow: (id: number, payload: PhasePayload) => Promise<void> | void;
+  onAddPhaseRow: (payload: PhasePayload) => Promise<Phase> | Phase;
+  onDeletePhaseRow: (id: number) => Promise<void> | void;
 }) {
-  const queryClient = useQueryClient();
-  const { data: plan } = usePlan(cycleId);
   const openModal = useUiStore((s) => s.openModal);
   const setOpenModal = useUiStore((s) => s.setOpenModal);
 
-  const invalidatePlan = async () => {
-    await queryClient.invalidateQueries({ queryKey: queryKeys.plan(cycleId) });
-  };
-  const invalidateCycle = async () => {
-    await queryClient.invalidateQueries({ queryKey: queryKeys.activeCycle() });
-    await queryClient.invalidateQueries({ queryKey: queryKeys.templates() });
-  };
-
-  if (!plan) return <p className="px-4 py-6 text-sm text-neutral-500">Lade...</p>;
   const cycle = plan.cycle;
 
   const saveExercise = async (dayId: number, exerciseId: number | undefined, payload: ExerciseInput) => {
-    if (exerciseId) await updateExerciseAction(exerciseId, payload);
-    else await createExerciseAction(dayId, payload);
+    await onSaveExercise(dayId, exerciseId, payload);
     setOpenModal(null);
-    await invalidatePlan();
   };
   const deleteExercise = async (exerciseId: number) => {
     if (!confirm('Uebung loeschen?')) return;
-    await deleteExerciseAction(exerciseId);
+    await onDeleteExercise(exerciseId);
     setOpenModal(null);
-    await invalidatePlan();
   };
 
   const exerciseModal = openModal && typeof openModal === 'object' && openModal.type === 'exercise' ? openModal : null;
@@ -187,13 +188,20 @@ export function PlanEditor({
 
       {dayModal && (
         <DayEditorModal
-          cycleId={cycle.id}
           day={editingDay}
           onClose={() => setOpenModal(null)}
-          onSaved={async () => {
+          onSave={async (payload) => {
+            await onSaveDay(editingDay, payload);
             setOpenModal(null);
-            await invalidatePlan();
           }}
+          onDelete={
+            editingDay
+              ? async () => {
+                  await onDeleteDay(editingDay);
+                  setOpenModal(null);
+                }
+              : undefined
+          }
         />
       )}
 
@@ -201,20 +209,20 @@ export function PlanEditor({
         <CycleSettingsModal
           cycle={cycle}
           onClose={() => setOpenModal(null)}
-          onSaved={async () => {
+          onSave={async (payload) => {
+            await onSaveCycle(payload);
             setOpenModal(null);
-            await invalidateCycle();
-            await invalidatePlan();
           }}
         />
       )}
 
       {openModal === 'phases' && (
         <PhasesEditorModal
-          cycleId={cycle.id}
           phases={plan.phases}
           onClose={() => setOpenModal(null)}
-          onSaved={invalidatePlan}
+          onSaveRow={onSavePhaseRow}
+          onAddRow={onAddPhaseRow}
+          onDeleteRow={onDeletePhaseRow}
         />
       )}
 

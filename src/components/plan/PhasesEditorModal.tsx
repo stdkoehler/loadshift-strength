@@ -2,39 +2,38 @@
 
 import { useState } from 'react';
 import { Modal } from '@/components/ui/Modal';
-import { createPhaseAction, deletePhaseAction, updatePhaseAction } from '@/server/actions/phases.actions';
 import type { Phase } from '@/lib/types';
+import type { PhasePayload } from './plan-editor-types';
 
 const inputClass = 'w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-100';
 const labelClass = 'mb-1 block text-xs font-medium text-neutral-400';
 
 export function PhasesEditorModal({
-  cycleId,
   phases,
   onClose,
-  onSaved,
+  onSaveRow,
+  onAddRow,
+  onDeleteRow,
 }: {
-  cycleId: number;
   phases: Phase[];
   onClose: () => void;
-  onSaved: () => void;
+  onSaveRow: (id: number, payload: PhasePayload) => Promise<void> | void;
+  onAddRow: (payload: PhasePayload) => Promise<Phase> | Phase;
+  onDeleteRow: (id: number) => Promise<void> | void;
 }) {
   const [rows, setRows] = useState(phases.map((p) => ({ ...p })));
   const update = (i: number, patch: Partial<Phase>) => setRows((r) => r.map((x, j) => (j === i ? { ...x, ...patch } : x)));
 
   const saveRow = async (row: Phase) => {
-    await updatePhaseAction(row.id, { name: row.name, startWeek: Number(row.startWeek), endWeek: Number(row.endWeek), color: row.color });
-    onSaved();
+    await onSaveRow(row.id, { name: row.name, startWeek: Number(row.startWeek), endWeek: Number(row.endWeek), color: row.color });
   };
   const addRow = async () => {
-    const p = await createPhaseAction(cycleId, { name: 'Neue Phase', startWeek: 1, endWeek: 1, color: '#7c5cff' });
-    setRows((r) => [...r, p as Phase]);
-    onSaved();
+    const p = await onAddRow({ name: 'Neue Phase', startWeek: 1, endWeek: 1, color: '#7c5cff' });
+    setRows((r) => [...r, p]);
   };
   const del = async (row: Phase) => {
-    await deletePhaseAction(row.id);
+    await onDeleteRow(row.id);
     setRows((r) => r.filter((x) => x.id !== row.id));
-    onSaved();
   };
 
   const footer = (
