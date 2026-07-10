@@ -90,6 +90,14 @@ export function TemplateDraftEditor({ cycleId, onExit }: { cycleId: number; onEx
           days: plan.days.map((d) => ({ ...d, exercises: d.exercises.filter((e) => e.id !== exerciseId) })),
         }));
       }}
+      onReorderExercises={(dayId, orderedIds) => {
+        update((plan) => ({
+          ...plan,
+          days: plan.days.map((d) =>
+            d.id !== dayId ? d : { ...d, exercises: orderedIds.map((id) => d.exercises.find((e) => e.id === id)!) }
+          ),
+        }));
+      }}
       onSaveDay={(day, payload) => {
         if (day) {
           update((plan) => ({ ...plan, days: plan.days.map((d) => (d.id === day.id ? { ...d, ...payload } : d)) }));

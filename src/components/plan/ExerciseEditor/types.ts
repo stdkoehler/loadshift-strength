@@ -10,6 +10,9 @@ export interface UniformVals {
   rir: number | string;
 }
 export interface CustomRow {
+  // Stable per-row id for drag-to-reorder (see SortableList) - never persisted, only
+  // array order matters once buildPayload runs.
+  _key: string;
   reps: number | string;
   weight: number | string;
   role: string;
@@ -21,6 +24,7 @@ export interface PhaseVal {
   rir: number | string;
 }
 export interface CustomPhaseRow {
+  _key: string;
   role: string;
   vals: Record<number, PhaseVal>;
 }

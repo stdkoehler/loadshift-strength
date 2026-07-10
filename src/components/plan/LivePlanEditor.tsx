@@ -4,7 +4,12 @@ import type { ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { usePlan } from '@/query/hooks/usePlan';
 import { queryKeys } from '@/query/keys';
-import { deleteExerciseAction, createExerciseAction, updateExerciseAction } from '@/server/actions/exercises.actions';
+import {
+  deleteExerciseAction,
+  createExerciseAction,
+  updateExerciseAction,
+  reorderExercisesAction,
+} from '@/server/actions/exercises.actions';
 import { createDayAction, deleteDayAction, updateDayAction } from '@/server/actions/days.actions';
 import { updateCycleAction } from '@/server/actions/cycles.actions';
 import { createPhaseAction, deletePhaseAction, updatePhaseAction } from '@/server/actions/phases.actions';
@@ -37,6 +42,10 @@ export function LivePlanEditor({ cycleId, headerExtra }: { cycleId: number; head
       }}
       onDeleteExercise={async (exerciseId) => {
         await deleteExerciseAction(exerciseId);
+        await invalidatePlan();
+      }}
+      onReorderExercises={async (dayId, orderedIds) => {
+        await reorderExercisesAction(dayId, orderedIds);
         await invalidatePlan();
       }}
       onSaveDay={async (day, payload) => {

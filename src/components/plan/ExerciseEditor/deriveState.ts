@@ -20,9 +20,9 @@ export function deriveState(initial: ExerciseWithSets | null, phases: Phase[]): 
       structure: 'uniform',
       activePhase: phases[0]?.id ?? null,
       uniform: { numSets: 3, reps: 10, weight: 20, increment: 1.25, rir: '' },
-      custom: [{ reps: 10, weight: 20, role: '', rir: '' }],
+      custom: [{ _key: crypto.randomUUID(), reps: 10, weight: 20, role: '', rir: '' }],
       phaseVals: emptyPhaseVals(phases),
-      customPhase: [{ role: '', vals: emptyPhaseVals(phases) }],
+      customPhase: [{ _key: crypto.randomUUID(), role: '', vals: emptyPhaseVals(phases) }],
       repeatIncrement: '',
     };
   }
@@ -46,6 +46,7 @@ export function deriveState(initial: ExerciseWithSets | null, phases: Phase[]): 
       rir: firstT?.targetRir ?? '',
     },
     custom: sets.map((s) => ({
+      _key: crypto.randomUUID(),
       reps: s.targets?.[0]?.reps ?? '',
       weight: s.targets?.[0]?.baseWeight ?? '',
       role: s.role || '',
@@ -60,6 +61,7 @@ export function deriveState(initial: ExerciseWithSets | null, phases: Phase[]): 
     customPhase: sets.map((s) => {
       const plain = s.targets?.find((x) => x.phaseId == null);
       return {
+        _key: crypto.randomUUID(),
         role: s.role || '',
         vals: Object.fromEntries(
           phases.map((p) => {
@@ -107,8 +109,8 @@ export function deriveState(initial: ExerciseWithSets | null, phases: Phase[]): 
     }
   }
   base.structure = uniform ? 'uniform' : 'custom';
-  if (!base.custom.length) base.custom = [{ reps: 10, weight: 20, role: '', rir: '' }];
-  if (!base.customPhase.length) base.customPhase = [{ role: '', vals: emptyPhaseVals(phases) }];
+  if (!base.custom.length) base.custom = [{ _key: crypto.randomUUID(), reps: 10, weight: 20, role: '', rir: '' }];
+  if (!base.customPhase.length) base.customPhase = [{ _key: crypto.randomUUID(), role: '', vals: emptyPhaseVals(phases) }];
   return base;
 }
 

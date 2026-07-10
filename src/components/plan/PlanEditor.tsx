@@ -10,6 +10,7 @@ import { DayEditorModal } from './DayEditorModal';
 import { ExportModal } from './ExportModal';
 import { ImportButton } from './ImportButton';
 import { IconSettings, IconDownload, IconEdit, IconPlus } from '@/components/ui/Icons';
+import { SortableList, SortableItem, DragHandle } from '@/components/ui/SortableList';
 import type { Day, ExerciseWithSets, FullPlan, Phase } from '@/lib/types';
 import type { ExerciseInput } from '@/zod/exercise.schema';
 import type { CyclePayload, DayPayload, PhasePayload } from './plan-editor-types';
@@ -49,6 +50,7 @@ export function PlanEditor({
   onSavePhaseRow,
   onAddPhaseRow,
   onDeletePhaseRow,
+  onReorderExercises,
 }: {
   plan: FullPlan;
   headerExtra?: ReactNode;
@@ -61,6 +63,7 @@ export function PlanEditor({
   onSavePhaseRow: (id: number, payload: PhasePayload) => Promise<void> | void;
   onAddPhaseRow: (payload: PhasePayload) => Promise<Phase> | Phase;
   onDeletePhaseRow: (id: number) => Promise<void> | void;
+  onReorderExercises: (dayId: number, orderedIds: number[]) => Promise<void> | void;
 }) {
   const openModal = useUiStore((s) => s.openModal);
   const setOpenModal = useUiStore((s) => s.setOpenModal);
@@ -135,23 +138,35 @@ export function PlanEditor({
               </button>
             </div>
 
-            {!day.isRest &&
-              day.exercises.map((ex) => (
-                <div key={ex.id} className="mt-2 flex items-center gap-2 rounded-lg bg-neutral-950/40 px-2 py-2">
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm text-neutral-100">{ex.name}</div>
-                    <div className="truncate text-xs text-neutral-500">{exSummary(ex)}</div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setOpenModal({ type: 'exercise', dayId: day.id, exerciseId: ex.id })}
-                    className="rounded-md px-2 py-1 text-neutral-500 hover:text-neutral-200"
-                    aria-label="Uebung bearbeiten"
-                  >
-                    <IconEdit width={16} height={16} />
-                  </button>
-                </div>
-              ))}
+            {!day.isRest && day.exercises.length > 0 && (
+              <SortableList
+                items={day.exercises}
+                getId={(ex) => ex.id}
+                onReorder={(next) => onReorderExercises(day.id, next.map((ex) => ex.id))}
+              >
+                {(ex) => (
+                  <SortableItem key={ex.id} id={ex.id} className="mt-2 flex items-center gap-2 rounded-lg bg-neutral-950/40 px-2 py-2">
+                    {(dragHandleProps) => (
+                      <>
+                        <DragHandle {...dragHandleProps} />
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-sm text-neutral-100">{ex.name}</div>
+                          <div className="truncate text-xs text-neutral-500">{exSummary(ex)}</div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setOpenModal({ type: 'exercise', dayId: day.id, exerciseId: ex.id })}
+                          className="rounded-md px-2 py-1 text-neutral-500 hover:text-neutral-200"
+                          aria-label="Uebung bearbeiten"
+                        >
+                          <IconEdit width={16} height={16} />
+                        </button>
+                      </>
+                    )}
+                  </SortableItem>
+                )}
+              </SortableList>
+            )}
 
             {!day.isRest && (
               <button
