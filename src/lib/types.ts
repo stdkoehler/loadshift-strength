@@ -169,3 +169,50 @@ export interface ExportPayload {
   days: ExportDay[];
   logs?: ExportLog[];
 }
+
+// ---------- AI export: plan + actual results, for pasting into an LLM ----------
+// Deliberately not the round-trip import format - no ids, no notes/pauseMin, just
+// enough structure + per-set history for an LLM to reason about progression.
+
+export interface AiExportSetTarget {
+  phase: string | null;
+  reps: number | null;
+  baseWeight: number | null;
+  incrementPerWeek: number;
+  rir: number | null;
+  incrementPerRepeat: number;
+}
+
+export interface AiExportSet {
+  setIndex: number;
+  role: string | null;
+  targets: AiExportSetTarget[];
+}
+
+export interface AiExportLogEntry {
+  date: string;
+  week: number;
+  setIndex: number;
+  targetReps: number | null;
+  targetWeight: number | null;
+  targetRir: number | null;
+  actualReps: number | null;
+  actualWeight: number | null;
+  actualRir: number | null;
+  done: boolean;
+}
+
+export interface AiExportExercise {
+  day: string;
+  name: string;
+  progressionType: string;
+  sets: AiExportSet[];
+  log: AiExportLogEntry[];
+}
+
+export interface AiExportPayload {
+  cycle: { name: string; startDate: string; currentWeek: number; lengthWeeks: number; waveLengthWeeks: number | null };
+  from: string;
+  to: string;
+  exercises: AiExportExercise[];
+}

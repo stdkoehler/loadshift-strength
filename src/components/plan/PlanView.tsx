@@ -7,7 +7,7 @@ import { LivePlanEditor } from './LivePlanEditor';
 import { TemplateDraftEditor } from './TemplateDraftEditor';
 import { TemplatesModal, LoadTemplatePrompt } from './TemplatesModal';
 import { SaveAsTemplateModal } from './SaveAsTemplateModal';
-import { IconBookmark } from '@/components/ui/Icons';
+import { IconBookmark, IconFolder } from '@/components/ui/Icons';
 
 export function PlanView() {
   const { data: cycle } = useActiveCycle();
@@ -27,25 +27,10 @@ export function PlanView() {
     <>
       <LivePlanEditor
         cycleId={cycle.id}
-        headerExtra={
-          <>
-            <button
-              type="button"
-              title="Save as Template"
-              onClick={() => setOpenModal('saveAsTemplate')}
-              className="rounded-md px-2 py-1 text-neutral-400 hover:text-neutral-200"
-            >
-              <IconBookmark width={18} height={18} />
-            </button>
-            <button
-              type="button"
-              onClick={() => setOpenModal('templates')}
-              className="ml-1 rounded-md border border-neutral-700 px-2 py-1 text-xs text-neutral-300"
-            >
-              Templates
-            </button>
-          </>
-        }
+        extraMenuItems={[
+          { label: 'Manage Templates', icon: IconFolder, onClick: () => setOpenModal('templates') },
+          { label: 'Save as Template', icon: IconBookmark, onClick: () => setOpenModal('saveAsTemplate') },
+        ]}
       />
       {openModal === 'templates' && <TemplatesModal onClose={() => setOpenModal(null)} />}
       {openModal === 'saveAsTemplate' && <SaveAsTemplateModal cycle={cycle} onClose={() => setOpenModal(null)} />}

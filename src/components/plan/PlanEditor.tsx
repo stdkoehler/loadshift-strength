@@ -8,8 +8,10 @@ import { CycleSettingsModal } from './CycleSettingsModal';
 import { PhasesEditorModal } from './PhasesEditorModal';
 import { DayEditorModal } from './DayEditorModal';
 import { ExportModal } from './ExportModal';
-import { ImportButton } from './ImportButton';
-import { IconSettings, IconDownload, IconEdit, IconPlus } from '@/components/ui/Icons';
+import { useImportPlan } from './useImportPlan';
+import { ActionMenu } from '@/components/ui/ActionMenu';
+import type { ActionMenuItem } from '@/components/ui/ActionMenu';
+import { IconSettings, IconDownload, IconUpload, IconEdit, IconPlus } from '@/components/ui/Icons';
 import { SortableList, SortableItem, DragHandle } from '@/components/ui/SortableList';
 import type { Day, ExerciseWithSets, FullPlan, Phase } from '@/lib/types';
 import type { ExerciseInput } from '@/zod/exercise.schema';
@@ -41,6 +43,7 @@ function exSummary(ex: ExerciseWithSets): string {
 export function PlanEditor({
   plan,
   headerExtra,
+  extraMenuItems = [],
   allowImportExport = true,
   onSaveExercise,
   onDeleteExercise,
@@ -54,6 +57,7 @@ export function PlanEditor({
 }: {
   plan: FullPlan;
   headerExtra?: ReactNode;
+  extraMenuItems?: ActionMenuItem[];
   allowImportExport?: boolean;
   onSaveExercise: (dayId: number, exerciseId: number | undefined, payload: ExerciseInput) => Promise<void> | void;
   onDeleteExercise: (exerciseId: number) => Promise<void> | void;
@@ -67,8 +71,19 @@ export function PlanEditor({
 }) {
   const openModal = useUiStore((s) => s.openModal);
   const setOpenModal = useUiStore((s) => s.setOpenModal);
+  const { trigger: triggerImport, inputElement: importInput } = useImportPlan();
 
   const cycle = plan.cycle;
+
+  const menuItems: ActionMenuItem[] = [
+    ...extraMenuItems,
+    ...(allowImportExport
+      ? [
+          { label: 'Export Plan (JSON)', icon: IconDownload, onClick: () => setOpenModal('export') },
+          { label: 'Import Plan (JSON)', icon: IconUpload, onClick: triggerImport },
+        ]
+      : []),
+  ];
 
   const saveExercise = async (dayId: number, exerciseId: number | undefined, payload: ExerciseInput) => {
     await onSaveExercise(dayId, exerciseId, payload);
@@ -98,14 +113,8 @@ export function PlanEditor({
           <button type="button" title="Cycle Settings" onClick={() => setOpenModal('cycle')} className="rounded-md px-2 py-1 text-neutral-400 hover:text-neutral-200">
             <IconSettings width={18} height={18} />
           </button>
-          {allowImportExport && (
-            <>
-              <button type="button" title="Export as JSON" onClick={() => setOpenModal('export')} className="rounded-md px-2 py-1 text-neutral-400 hover:text-neutral-200">
-                <IconDownload width={18} height={18} />
-              </button>
-              <ImportButton />
-            </>
-          )}
+          <ActionMenu items={menuItems} />
+          {importInput}
           {headerExtra}
         </div>
       </div>

@@ -63,6 +63,20 @@ export const IconGrip = (p: SVGProps<SVGSVGElement>) => (
 export const IconChevronDown = (p: SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" {...s} {...p}><path d="M6 9l6 6 6-6" /></svg>
 );
+export const IconSparkle = (p: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" {...s} fill="currentColor" stroke="none" {...p}>
+    <path d="M12 2l1.8 5.6L19.4 9l-5.6 1.8L12 16.4l-1.8-5.6L4.6 9l5.6-1.4L12 2z" />
+    <path d="M19 15l.9 2.7L22.6 18.6l-2.7.9L19 22.2l-.9-2.7-2.7-.9 2.7-.9L19 15z" opacity="0.7" />
+  </svg>
+);
+export const IconMoreVertical = (p: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" {...s} fill="currentColor" stroke="none" {...p}>
+    <circle cx="12" cy="5" r="1.8" /><circle cx="12" cy="12" r="1.8" /><circle cx="12" cy="19" r="1.8" />
+  </svg>
+);
+export const IconFolder = (p: SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" {...s} {...p}><path d="M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6z" /></svg>
+);
 export const IconSettings = (p: SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" {...s} {...p}><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>
 );

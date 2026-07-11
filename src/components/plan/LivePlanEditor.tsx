@@ -14,6 +14,7 @@ import { createDayAction, deleteDayAction, updateDayAction } from '@/server/acti
 import { updateCycleAction } from '@/server/actions/cycles.actions';
 import { createPhaseAction, deletePhaseAction, updatePhaseAction } from '@/server/actions/phases.actions';
 import { PlanEditor } from './PlanEditor';
+import type { ActionMenuItem } from '@/components/ui/ActionMenu';
 import type { Phase } from '@/lib/types';
 
 /**
@@ -21,7 +22,15 @@ import type { Phase } from '@/lib/types';
  * server actions, then invalidates the plan query. See TemplateDraftEditor for the
  * local-draft counterpart used when editing a template.
  */
-export function LivePlanEditor({ cycleId, headerExtra }: { cycleId: number; headerExtra?: ReactNode }) {
+export function LivePlanEditor({
+  cycleId,
+  headerExtra,
+  extraMenuItems,
+}: {
+  cycleId: number;
+  headerExtra?: ReactNode;
+  extraMenuItems?: ActionMenuItem[];
+}) {
   const queryClient = useQueryClient();
   const { data: plan } = usePlan(cycleId);
 
@@ -34,6 +43,7 @@ export function LivePlanEditor({ cycleId, headerExtra }: { cycleId: number; head
     <PlanEditor
       plan={plan}
       headerExtra={headerExtra}
+      extraMenuItems={extraMenuItems}
       allowImportExport
       onSaveExercise={async (dayId, exerciseId, payload) => {
         if (exerciseId) await updateExerciseAction(exerciseId, payload);

@@ -5,6 +5,8 @@ import { useProgress, useProgressList } from '@/query/hooks/useProgress';
 import { usePlan } from '@/query/hooks/usePlan';
 import { LineChart, BarChart } from './Charts';
 import { PlanOverview } from './PlanOverview';
+import { AiExportModal } from './AiExportModal';
+import { IconSparkle } from '@/components/ui/Icons';
 
 const TARGET_COLOR = '#a78bfa';
 const ACTUAL_COLOR = '#34d399';
@@ -14,6 +16,7 @@ export function ProgressView() {
   const { data: list } = useProgressList();
   const [weekday, setWeekday] = useState<number | undefined>(undefined);
   const [exerciseId, setExerciseId] = useState<number | undefined>(undefined);
+  const [aiExportOpen, setAiExportOpen] = useState(false);
   const { data } = useProgress(exerciseId);
   const { data: plan } = usePlan(list?.cycle?.id);
 
@@ -46,7 +49,17 @@ export function ProgressView() {
       {plan && <PlanOverview plan={plan} />}
 
       <div>
-        <div className="text-xs uppercase tracking-wide text-neutral-500">Progress</div>
+        <div className="flex items-center justify-between">
+          <div className="text-xs uppercase tracking-wide text-neutral-500">Progress</div>
+          <button
+            type="button"
+            onClick={() => setAiExportOpen(true)}
+            className="flex items-center gap-1 rounded-full border border-neutral-800 bg-neutral-900 px-2.5 py-1 text-xs text-neutral-400 hover:border-neutral-600 hover:text-neutral-200"
+          >
+            <IconSparkle width={13} height={13} />
+            Export for AI
+          </button>
+        </div>
 
         <div className="app-scroll-x -mx-1 mt-2 flex gap-2 overflow-x-auto px-1 pb-1">
           {days.map((d) => (
@@ -147,6 +160,8 @@ export function ProgressView() {
           )}
         </>
       )}
+
+      {aiExportOpen && <AiExportModal cycle={list.cycle} onClose={() => setAiExportOpen(false)} />}
     </div>
   );
 }

@@ -130,7 +130,7 @@ export function HistoryView() {
                 {n}
               </button>
             ))}
-            {shownNames.length === 0 && <p className="text-xs text-neutral-500">No exercises match "{filter}".</p>}
+            {shownNames.length === 0 && <p className="text-xs text-neutral-500">No exercises match &quot;{filter}&quot;.</p>}
           </div>
 
           {trend && trend.points.length > 0 ? (
