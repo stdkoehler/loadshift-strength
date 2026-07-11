@@ -3,7 +3,7 @@ import type { SVGProps } from 'react';
 const s = { width: 22, height: 22, fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
 
 export const IconDumbbell = (p: SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 24 24" {...s} {...p}><path d="M6.5 6.5l11 11M4 8v8M8 4v8m8 4V8m4 0v8M2 12h2m16 0h2" /></svg>
+  <svg viewBox="0 0 24 24" {...s} {...p}><path d="M8 12h8 M4 8v8 M8 8v8 M16 8v8 M20 8v8 M2 12h2 M20 12h2" /></svg>
 );
 export const IconCalendar = (p: SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" {...s} {...p}><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
@@ -35,7 +35,7 @@ export const IconDownload = (p: SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" {...s} {...p}><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" /></svg>
 );
 export const IconUpload = (p: SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 24 24" {...s} {...p}><path d="M12 21V9m0 0l-4 4m4-4l4 4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" /></svg>
+  <svg viewBox="0 0 24 24" {...s} {...p}><path d="M12 15V3m0 0l-4 4m4-4l4 4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" /></svg>
 );
 export const IconLogo = (p: SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" {...s} {...p}>
