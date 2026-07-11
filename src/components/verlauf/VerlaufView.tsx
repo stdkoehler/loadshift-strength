@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { useHistoryDays, useHistoryExerciseNames, useHistoryExercise } from '@/query/hooks/useHistory';
 import { LineChart } from '@/components/progress/Charts';
+import { Dropdown } from '@/components/ui/Dropdown';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { addDays, todayIso, formatDate, dowShort, fmt } from '@/lib/date';
 
-const SOLL_COLOR = '#60a5fa';
+const SOLL_COLOR = '#a78bfa';
 const IST_COLOR = '#34d399';
 
 export function VerlaufView() {
@@ -23,19 +25,9 @@ export function VerlaufView() {
       <div>
         <div className="text-xs uppercase tracking-wide text-neutral-500">Verlauf</div>
         <div className="mt-2 flex items-center gap-2">
-          <input
-            type="date"
-            value={from}
-            onChange={(e) => setFrom(e.target.value)}
-            className="w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-100"
-          />
+          <DatePicker value={from} onChange={setFrom} className="w-full" />
           <span className="text-neutral-600">–</span>
-          <input
-            type="date"
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-            className="w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-100"
-          />
+          <DatePicker value={to} onChange={setTo} className="w-full" />
         </div>
       </div>
 
@@ -43,15 +35,12 @@ export function VerlaufView() {
         <div className="rounded-xl border border-neutral-800 bg-neutral-900/60 p-3">
           <div className="mb-2 flex items-center justify-between gap-2">
             <h4 className="text-sm font-semibold text-neutral-100">Uebungsverlauf</h4>
-            <select
-              className="rounded-md border border-neutral-700 bg-neutral-800 px-2 py-1 text-xs text-neutral-100"
+            <Dropdown
+              className="w-auto max-w-[60%]"
+              options={exerciseNames.map((n) => ({ value: n, label: n }))}
               value={activeExercise}
-              onChange={(e) => setExerciseName(e.target.value)}
-            >
-              {exerciseNames.map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
+              onChange={setExerciseName}
+            />
           </div>
           {trend && trend.points.length > 0 ? (
             <>

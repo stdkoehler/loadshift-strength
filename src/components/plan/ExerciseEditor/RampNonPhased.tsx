@@ -1,6 +1,9 @@
 import { ROLES, type CustomRow, type EditorState } from './types';
 import { inputClass, labelClass } from './styles';
 import { SortableList, SortableItem, DragHandle } from '@/components/ui/SortableList';
+import { Dropdown } from '@/components/ui/Dropdown';
+
+const ROLE_OPTIONS = [{ value: '', label: '— keine Rolle —' }, ...ROLES.filter(Boolean).map((r) => ({ value: r, label: r }))];
 
 export function RampNonPhased({ st, patch }: { st: EditorState; patch: (p: Partial<EditorState>) => void }) {
   const updateRow = (i: number, field: 'reps' | 'weight' | 'role' | 'rir', value: string) => {
@@ -41,16 +44,7 @@ export function RampNonPhased({ st, patch }: { st: EditorState; patch: (p: Parti
                       ✕
                     </button>
                   </div>
-                  <select
-                    className={inputClass}
-                    value={c.role || ''}
-                    onChange={(e) => updateRow(rowIndex, 'role', e.target.value)}
-                  >
-                    <option value="">— keine Rolle —</option>
-                    {ROLES.filter(Boolean).map((r) => (
-                      <option key={r} value={r}>{r}</option>
-                    ))}
-                  </select>
+                  <Dropdown options={ROLE_OPTIONS} value={c.role || ''} onChange={(v) => updateRow(rowIndex, 'role', v)} />
                 </>
               )}
             </SortableItem>

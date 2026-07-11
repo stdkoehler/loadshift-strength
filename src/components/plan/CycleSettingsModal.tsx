@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Modal } from '@/components/ui/Modal';
+import { DatePicker } from '@/components/ui/DatePicker';
 import type { Cycle } from '@/lib/types';
 import type { CyclePayload } from './plan-editor-types';
 
@@ -51,7 +52,7 @@ export function CycleSettingsModal({
       {!cycle.isTemplate && (
         <div>
           <label className={labelClass}>Startdatum (Montag Woche 1)</label>
-          <input type="date" className={inputClass} value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+          <DatePicker value={startDate} onChange={setStartDate} />
         </div>
       )}
       <div>

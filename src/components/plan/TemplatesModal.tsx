@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Modal } from '@/components/ui/Modal';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { useTemplates } from '@/query/hooks/useTemplates';
 import { queryKeys } from '@/query/keys';
 import { useUiStore } from '@/stores/ui-store';
@@ -165,12 +166,7 @@ export function LoadTemplatePrompt({ onClose }: { onClose: () => void }) {
     >
       <div>
         <label className="mb-1 block text-xs font-medium text-neutral-400">Startdatum (Montag Woche 1)</label>
-        <input
-          type="date"
-          className="w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-100"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        />
+        <DatePicker value={startDate} onChange={setStartDate} />
       </div>
       <p className="text-xs text-neutral-500">
         Erstellt eine neue Kopie dieser Vorlage als aktiven Plan ab dem gewaehlten Datum. Der aktuelle aktive Plan bleibt erhalten (inkl. seiner Historie), wird aber nicht mehr angezeigt.

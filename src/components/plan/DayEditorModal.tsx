@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Modal } from '@/components/ui/Modal';
+import { Dropdown } from '@/components/ui/Dropdown';
 import type { Day } from '@/lib/types';
 import type { DayPayload } from './plan-editor-types';
 
@@ -56,11 +57,11 @@ export function DayEditorModal({
     <Modal title={day ? 'Tag bearbeiten' : 'Neuer Trainingstag'} onClose={onClose} footer={footer}>
       <div>
         <label className={labelClass}>Wochentag</label>
-        <select className={inputClass} value={weekday} onChange={(e) => setWeekday(Number(e.target.value))}>
-          {Object.entries(WD).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
-        </select>
+        <Dropdown
+          options={Object.entries(WD).map(([k, v]) => ({ value: Number(k), label: v }))}
+          value={weekday}
+          onChange={setWeekday}
+        />
       </div>
       <div>
         <label className={labelClass}>Bezeichnung (Muskelgruppe)</label>

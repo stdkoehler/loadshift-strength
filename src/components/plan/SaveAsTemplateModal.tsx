@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Modal } from '@/components/ui/Modal';
+import { Dropdown } from '@/components/ui/Dropdown';
 import { useTemplates } from '@/query/hooks/useTemplates';
 import { queryKeys } from '@/query/keys';
 import { saveActivePlanAsTemplateAction } from '@/server/actions/templates.actions';
@@ -62,16 +63,11 @@ export function SaveAsTemplateModal({ cycle, onClose }: { cycle: Cycle; onClose:
       </div>
       <div>
         <label className={labelClass}>Bestehende Vorlage ueberschreiben (optional)</label>
-        <select
-          className={inputClass}
+        <Dropdown
+          options={[{ value: '' as const, label: 'Als neue Vorlage anlegen' }, ...(templates?.map((t) => ({ value: t.id, label: t.name })) ?? [])]}
           value={overwriteId}
-          onChange={(e) => setOverwriteId(e.target.value === '' ? '' : Number(e.target.value))}
-        >
-          <option value="">Als neue Vorlage anlegen</option>
-          {templates?.map((t) => (
-            <option key={t.id} value={t.id}>{t.name}</option>
-          ))}
-        </select>
+          onChange={setOverwriteId}
+        />
       </div>
       <p className="text-xs text-neutral-500">
         Speichert die aktuelle Struktur (Tage, Uebungen, Saetze, Phasen) als wiederverwendbare Vorlage - ohne Startdatum und ohne

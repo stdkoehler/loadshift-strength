@@ -2,15 +2,19 @@
 
 import { useEffect, useState } from 'react';
 import { useProgress, useProgressList } from '@/query/hooks/useProgress';
+import { usePlan } from '@/query/hooks/usePlan';
 import { LineChart, BarChart } from './Charts';
+import { PlanOverview } from './PlanOverview';
+import { Dropdown } from '@/components/ui/Dropdown';
 
-const SOLL_COLOR = '#60a5fa';
+const SOLL_COLOR = '#a78bfa';
 const IST_COLOR = '#34d399';
 
 export function ProgressView() {
   const { data: list } = useProgressList();
   const [exerciseId, setExerciseId] = useState<number | undefined>(undefined);
   const { data } = useProgress(exerciseId);
+  const { data: plan } = usePlan(list?.cycle?.id);
 
   useEffect(() => {
     if (exerciseId == null && list?.exercises?.length) setExerciseId(list.exercises[0].id);
@@ -23,17 +27,17 @@ export function ProgressView() {
 
   return (
     <div className="flex flex-col gap-4 px-4 py-3">
+      {plan && <PlanOverview plan={plan} />}
+
       <div>
         <div className="text-xs uppercase tracking-wide text-neutral-500">Fortschritt</div>
-        <select
-          className="mt-2 w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-100"
-          value={exerciseId ?? ''}
-          onChange={(e) => setExerciseId(Number(e.target.value))}
-        >
-          {list.exercises.map((it) => (
-            <option key={it.id} value={it.id}>{it.day} · {it.name}</option>
-          ))}
-        </select>
+        <div className="mt-2">
+          <Dropdown
+            options={list.exercises.map((it) => ({ value: it.id, label: `${it.day} · ${it.name}` }))}
+            value={exerciseId}
+            onChange={setExerciseId}
+          />
+        </div>
       </div>
 
       {!data && <p className="text-sm text-neutral-500">Lade...</p>}

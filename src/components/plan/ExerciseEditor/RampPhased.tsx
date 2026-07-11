@@ -3,6 +3,9 @@ import { ROLES, type CustomPhaseRow, type EditorState } from './types';
 import { emptyPhaseVals } from './deriveState';
 import { hintClass, inputClass, labelClass } from './styles';
 import { SortableList, SortableItem, DragHandle } from '@/components/ui/SortableList';
+import { Dropdown } from '@/components/ui/Dropdown';
+
+const ROLE_OPTIONS = [{ value: '', label: '— keine Rolle —' }, ...ROLES.filter(Boolean).map((r) => ({ value: r, label: r }))];
 
 export function RampPhased({
   st,
@@ -87,12 +90,7 @@ export function RampPhased({
                       ✕
                     </button>
                   </div>
-                  <select className={inputClass} value={c.role || ''} onChange={(e) => updateRole(rowIndex, e.target.value)}>
-                    <option value="">— keine Rolle —</option>
-                    {ROLES.filter(Boolean).map((r) => (
-                      <option key={r} value={r}>{r}</option>
-                    ))}
-                  </select>
+                  <Dropdown options={ROLE_OPTIONS} value={c.role || ''} onChange={(v) => updateRole(rowIndex, v)} />
                 </>
               )}
             </SortableItem>
