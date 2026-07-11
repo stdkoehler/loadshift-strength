@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useHistoryDays, useHistoryExerciseNames, useHistoryExercise } from '@/query/hooks/useHistory';
 import { LineChart } from '@/components/progress/Charts';
-import { Dropdown } from '@/components/ui/Dropdown';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { IconChevronDown } from '@/components/ui/Icons';
 import { addDays, todayIso, formatDate, dowShort, fmt } from '@/lib/date';
@@ -11,6 +10,10 @@ import type { HistorySetEntry } from '@/lib/types';
 
 const TARGET_COLOR = '#a78bfa';
 const ACTUAL_COLOR = '#34d399';
+
+// Below this count, tap chips alone are fine. Past it (e.g. years of logs across many
+// plans), a filter input keeps the picker usable without shrinking every chip to fit.
+const FILTER_THRESHOLD = 15;
 
 interface ExerciseGroup {
   exerciseId: number;
@@ -76,11 +79,15 @@ export function HistoryView() {
   const [from, setFrom] = useState(addDays(todayIso(), -30));
   const [to, setTo] = useState(todayIso());
   const [exerciseName, setExerciseName] = useState<string | undefined>(undefined);
+  const [filter, setFilter] = useState('');
 
   const { data: days } = useHistoryDays(from, to);
-  const { data: exerciseNames } = useHistoryExerciseNames();
+  const { data: exerciseNames } = useHistoryExerciseNames(from, to);
   const activeExercise = exerciseName ?? exerciseNames?.[0];
   const { data: trend } = useHistoryExercise(activeExercise, from, to);
+  const shownNames = filter
+    ? (exerciseNames ?? []).filter((n) => n.toLowerCase().includes(filter.toLowerCase()))
+    : (exerciseNames ?? []);
   const hasRir = trend?.points?.some((p) => p.targetRir != null || p.actualRir != null);
 
   return (
@@ -96,15 +103,36 @@ export function HistoryView() {
 
       {exerciseNames && exerciseNames.length > 0 && (
         <div className="rounded-xl border border-neutral-800 bg-neutral-900/60 p-3">
-          <div className="mb-2 flex items-center justify-between gap-2">
-            <h4 className="text-sm font-semibold text-neutral-100">Exercise History</h4>
-            <Dropdown
-              className="w-auto max-w-[60%]"
-              options={exerciseNames.map((n) => ({ value: n, label: n }))}
-              value={activeExercise}
-              onChange={setExerciseName}
+          <h4 className="mb-2 text-sm font-semibold text-neutral-100">Exercise History</h4>
+
+          {exerciseNames.length > FILTER_THRESHOLD && (
+            <input
+              type="text"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              placeholder="Filter exercises..."
+              className="mb-2 w-full rounded-lg border border-neutral-800 bg-neutral-950/40 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 outline-none focus:border-emerald-500/70"
             />
+          )}
+
+          <div className="mb-3 flex flex-wrap gap-2">
+            {shownNames.map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setExerciseName(n)}
+                className={`rounded-full border px-3.5 py-2 text-xs font-medium transition-colors ${
+                  n === activeExercise
+                    ? 'border-emerald-500/60 bg-emerald-500/15 text-emerald-300'
+                    : 'border-neutral-800 bg-neutral-900 text-neutral-400 hover:border-neutral-600'
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+            {shownNames.length === 0 && <p className="text-xs text-neutral-500">No exercises match "{filter}".</p>}
           </div>
+
           {trend && trend.points.length > 0 ? (
             <>
               <LineChart

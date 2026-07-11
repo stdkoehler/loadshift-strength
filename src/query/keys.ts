@@ -6,6 +6,6 @@ export const queryKeys = {
   progress: (exerciseId: number) => ['progress', exerciseId] as const,
   templates: () => ['templates'] as const,
   historyDays: (from: string, to: string) => ['history-days', from, to] as const,
-  historyExerciseNames: () => ['history-exercise-names'] as const,
+  historyExerciseNames: (from: string, to: string) => ['history-exercise-names', from, to] as const,
   historyExercise: (name: string, from: string, to: string) => ['history-exercise', name, from, to] as const,
 };

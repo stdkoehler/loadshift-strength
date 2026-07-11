@@ -12,10 +12,10 @@ export function useHistoryDays(from: string, to: string) {
   });
 }
 
-export function useHistoryExerciseNames() {
+export function useHistoryExerciseNames(from: string, to: string) {
   return useQuery({
-    queryKey: queryKeys.historyExerciseNames(),
-    queryFn: () => fetchJson<string[]>('/api/history/exercise-names'),
+    queryKey: queryKeys.historyExerciseNames(from, to),
+    queryFn: () => fetchJson<string[]>(`/api/history/exercise-names?from=${from}&to=${to}`),
   });
 }
 

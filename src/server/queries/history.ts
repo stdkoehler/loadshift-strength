@@ -52,11 +52,12 @@ export async function getHistoryDays(fromDate: string, toDate: string): Promise<
   return Array.from(byDate.values()).sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
-export async function listLoggedExerciseNames(): Promise<string[]> {
+export async function listLoggedExerciseNames(fromDate: string, toDate: string): Promise<string[]> {
   const rows = await db
     .selectDistinct({ name: exercises.name })
     .from(logs)
     .innerJoin(exercises, eq(exercises.id, logs.exerciseId))
+    .where(and(gte(logs.logDate, fromDate), lte(logs.logDate, toDate)))
     .orderBy(asc(exercises.name));
   return rows.map((r) => r.name);
 }
