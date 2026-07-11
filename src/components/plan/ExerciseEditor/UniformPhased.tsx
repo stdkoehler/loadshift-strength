@@ -18,7 +18,7 @@ export function UniformPhased({
   return (
     <div className="flex flex-col gap-3">
       <div>
-        <label className={labelClass}>Anzahl Saetze</label>
+        <label className={labelClass}>Number of Sets</label>
         <input
           inputMode="numeric"
           className={inputClass}
@@ -27,14 +27,14 @@ export function UniformPhased({
         />
       </div>
       <div>
-        <label className={labelClass}>Ziel je Phase (Wdh x Gewicht)</label>
+        <label className={labelClass}>Target per phase (reps x weight)</label>
         <div className="flex flex-col gap-2">
           {phases.map((p) => (
             <div key={p.id} className="grid grid-cols-[1fr_1fr_1fr_1fr] items-center gap-2">
               <span className="text-xs font-medium" style={{ color: p.color ?? undefined }}>{p.name}</span>
               <input
                 inputMode="numeric"
-                placeholder="Wdh"
+                placeholder="Reps"
                 className={inputClass}
                 value={st.phaseVals[p.id]?.reps ?? ''}
                 onChange={(e) => updatePhaseVal(p.id, 'reps', e.target.value)}
@@ -57,7 +57,7 @@ export function UniformPhased({
           ))}
         </div>
       </div>
-      <p className={hintClass}>Gewicht/Wdh richten sich je Woche automatisch nach der aktiven Phase.</p>
+      <p className={hintClass}>Weight/reps automatically follow the active phase each week.</p>
     </div>
   );
 }

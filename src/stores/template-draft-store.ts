@@ -12,7 +12,7 @@ interface TemplateDraftState {
 }
 
 // Holds the in-progress edit of a template while TemplateDraftEditor is open. Edits
-// only ever touch this local copy - nothing reaches the DB until the "Speichern"
+// only ever touch this local copy - nothing reaches the DB until the "Save"
 // button calls replaceTemplateContentAction with the whole draft. New days/exercises/
 // phases get a negative, globally-unique temp id (see takeTempId) so they can be
 // referenced before they have a real DB id.

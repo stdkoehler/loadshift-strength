@@ -39,12 +39,12 @@ export function SaveAsTemplateModal({ cycle, onClose }: { cycle: Cycle; onClose:
 
   return (
     <Modal
-      title="Als Vorlage speichern"
+      title="Save as Template"
       onClose={onClose}
       footer={
         <>
           <button type="button" onClick={onClose} className="ml-auto rounded-md px-3 py-1.5 text-sm text-neutral-400">
-            Abbrechen
+            Cancel
           </button>
           <button
             type="button"
@@ -52,26 +52,26 @@ export function SaveAsTemplateModal({ cycle, onClose }: { cycle: Cycle; onClose:
             onClick={save}
             className="rounded-md bg-emerald-500 px-3 py-1.5 text-sm font-medium text-neutral-950 disabled:opacity-50"
           >
-            Speichern
+            Save
           </button>
         </>
       }
     >
       <div>
-        <label className={labelClass}>Name der Vorlage</label>
+        <label className={labelClass}>Template name</label>
         <input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} autoFocus />
       </div>
       <div>
-        <label className={labelClass}>Bestehende Vorlage ueberschreiben (optional)</label>
+        <label className={labelClass}>Overwrite an existing template (optional)</label>
         <Dropdown
-          options={[{ value: '' as const, label: 'Als neue Vorlage anlegen' }, ...(templates?.map((t) => ({ value: t.id, label: t.name })) ?? [])]}
+          options={[{ value: '' as const, label: 'Create as new template' }, ...(templates?.map((t) => ({ value: t.id, label: t.name })) ?? [])]}
           value={overwriteId}
           onChange={setOverwriteId}
         />
       </div>
       <p className="text-xs text-neutral-500">
-        Speichert die aktuelle Struktur (Tage, Uebungen, Saetze, Phasen) als wiederverwendbare Vorlage - ohne Startdatum und ohne
-        geloggte Trainingstage. Dein aktiver Plan und seine Historie bleiben unveraendert.
+        Saves the current structure (days, exercises, sets, phases) as a reusable template - without a start date and without
+        logged training days. Your active plan and its history remain unchanged.
       </p>
     </Modal>
   );

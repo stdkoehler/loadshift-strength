@@ -1,5 +1,4 @@
-// Ported 1:1 from server/backend/src/seed.js so a fresh next-ref install shows
-// the same reference plan as the original app instead of an empty state.
+// Reference plan seeded into a fresh install so the app doesn't start empty.
 import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import * as schema from './schema';
 
@@ -11,76 +10,76 @@ function mondayOf(date: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
-type RampSet = { wdh: number; weight: number; role?: string };
+type RampSet = { reps: number; weight: number; role?: string };
 type ExerciseDef =
-  | { name: string; saetze: number; wdh: number; pause: number; start: number; steig: number; role?: string }
-  | { ramp: true; name: string; pause: number; sets: RampSet[] }
-  | { phased: true; name: string; saetze: number; pause: number; hyper: [number, number]; kraft: [number, number]; ausdauer: [number, number] };
+  | { name: string; sets: number; reps: number; rest: number; start: number; increment: number; role?: string }
+  | { ramp: true; name: string; rest: number; sets: RampSet[] }
+  | { phased: true; name: string; sets: number; rest: number; hyper: [number, number]; strength: [number, number]; endurance: [number, number] };
 
 type DayDef = { weekday: number; name: string; focus?: string; isRest?: boolean; exercises: ExerciseDef[] };
 
 const DAYS: DayDef[] = [
-  { weekday: 1, name: 'Brust / Schulter', focus: 'Kraft', exercises: [
-    { name: 'LH Bankdruecken', saetze: 5, wdh: 5, pause: 2.5, start: 89, steig: 1.25 },
-    { name: 'LH Bankdruecken eng', saetze: 3, wdh: 12, pause: 2.5, start: 69, steig: 1.25 },
-    { name: 'KH Fly (2x25 kg Kurzhantel)', saetze: 3, wdh: 25, pause: 2.5, start: 25, steig: 1.25, role: 'Kraftausdauer-Touch' },
-    { name: 'Seitheben', saetze: 3, wdh: 20, pause: 2.5, start: 15, steig: 0.5, role: 'Kraftausdauer-Touch' },
+  { weekday: 1, name: 'Chest / Shoulders', focus: 'Strength', exercises: [
+    { name: 'Barbell Bench Press', sets: 5, reps: 5, rest: 2.5, start: 89, increment: 1.25 },
+    { name: 'Barbell Close-Grip Bench Press', sets: 3, reps: 12, rest: 2.5, start: 69, increment: 1.25 },
+    { name: 'Dumbbell Fly (2x25 kg)', sets: 3, reps: 25, rest: 2.5, start: 25, increment: 1.25, role: 'Endurance-Touch' },
+    { name: 'Lateral Raise', sets: 3, reps: 20, rest: 2.5, start: 15, increment: 0.5, role: 'Endurance-Touch' },
   ] },
-  { weekday: 2, name: 'Leg', focus: 'Kraft', exercises: [
-    { ramp: true, name: 'LH Kniebeugen', pause: 2.5, sets: [
-      { wdh: 25, weight: 49, role: 'Warm-up' },
-      { wdh: 6, weight: 149, role: 'Top-Satz' },
-      { wdh: 6, weight: 149, role: 'Top-Satz' },
-      { wdh: 8, weight: 119, role: 'Back-off' },
+  { weekday: 2, name: 'Legs', focus: 'Strength', exercises: [
+    { ramp: true, name: 'Barbell Squat', rest: 2.5, sets: [
+      { reps: 25, weight: 49, role: 'Warm-up' },
+      { reps: 6, weight: 149, role: 'Top-Set' },
+      { reps: 6, weight: 149, role: 'Top-Set' },
+      { reps: 8, weight: 119, role: 'Back-off' },
     ] },
-    { name: 'Kreuzheben', saetze: 5, wdh: 6, pause: 2.5, start: 97, steig: 1.25 },
-    { name: 'LH Wadenheben', saetze: 5, wdh: 20, pause: 2.5, start: 119, steig: 1.25, role: 'Kraftausdauer-Touch' },
-    { name: 'Haengend Beinheben (Koerpergewicht)', saetze: 3, wdh: 25, pause: 2.5, start: 0, steig: 0 },
+    { name: 'Deadlift', sets: 5, reps: 6, rest: 2.5, start: 97, increment: 1.25 },
+    { name: 'Barbell Calf Raise', sets: 5, reps: 20, rest: 2.5, start: 119, increment: 1.25, role: 'Endurance-Touch' },
+    { name: 'Hanging Leg Raise (Bodyweight)', sets: 3, reps: 25, rest: 2.5, start: 0, increment: 0 },
   ] },
-  { weekday: 3, name: 'Pause', focus: '', isRest: true, exercises: [] },
-  { weekday: 4, name: 'Ruecken', focus: 'Periodisiert', exercises: [
-    { phased: true, name: 'Klimmzuege', saetze: 5, pause: 2.0, hyper: [10, 22], kraft: [5, 30], ausdauer: [18, 15] },
-    { phased: true, name: 'LH Rudern', saetze: 5, pause: 2.0, hyper: [10, 72], kraft: [6, 78], ausdauer: [18, 55] },
-    { phased: true, name: 'KH Rudern', saetze: 3, pause: 1.5, hyper: [12, 40], kraft: [7, 44], ausdauer: [22, 30] },
-    { phased: true, name: 'Ueberzuege', saetze: 5, pause: 1.5, hyper: [14, 40], kraft: [9, 44], ausdauer: [20, 32] },
+  { weekday: 3, name: 'Rest', focus: '', isRest: true, exercises: [] },
+  { weekday: 4, name: 'Back', focus: 'Periodized', exercises: [
+    { phased: true, name: 'Pull-Ups', sets: 5, rest: 2.0, hyper: [10, 22], strength: [5, 30], endurance: [18, 15] },
+    { phased: true, name: 'Barbell Row', sets: 5, rest: 2.0, hyper: [10, 72], strength: [6, 78], endurance: [18, 55] },
+    { phased: true, name: 'Dumbbell Row', sets: 3, rest: 1.5, hyper: [12, 40], strength: [7, 44], endurance: [22, 30] },
+    { phased: true, name: 'Pullover', sets: 5, rest: 1.5, hyper: [14, 40], strength: [9, 44], endurance: [20, 32] },
   ] },
-  { weekday: 5, name: 'Brust', focus: 'Hypertrophie', exercises: [
-    { name: 'LH Bankdruecken', saetze: 5, wdh: 12, pause: 2.5, start: 79, steig: 1.25 },
-    { name: 'KH Bankdruecken (2x25 kg Kurzhantel)', saetze: 3, wdh: 15, pause: 2.5, start: 25, steig: 1.25 },
-    { name: 'KH Schraegbankdruecken (2x25 kg Kurzhantel)', saetze: 3, wdh: 15, pause: 2.5, start: 25, steig: 1.25 },
-    { ramp: true, name: 'LH Schraegbankdruecken', pause: 2.5, sets: [
-      { wdh: 15, weight: 39, role: 'Warm-up' },
-      { wdh: 10, weight: 49, role: 'Top-Satz' },
-      { wdh: 10, weight: 49, role: 'Top-Satz' },
-      { wdh: 10, weight: 49, role: 'Top-Satz' },
-      { wdh: 10, weight: 49, role: 'Top-Satz' },
+  { weekday: 5, name: 'Chest', focus: 'Hypertrophy', exercises: [
+    { name: 'Barbell Bench Press', sets: 5, reps: 12, rest: 2.5, start: 79, increment: 1.25 },
+    { name: 'Dumbbell Bench Press (2x25 kg)', sets: 3, reps: 15, rest: 2.5, start: 25, increment: 1.25 },
+    { name: 'Dumbbell Incline Bench Press (2x25 kg)', sets: 3, reps: 15, rest: 2.5, start: 25, increment: 1.25 },
+    { ramp: true, name: 'Barbell Incline Bench Press', rest: 2.5, sets: [
+      { reps: 15, weight: 39, role: 'Warm-up' },
+      { reps: 10, weight: 49, role: 'Top-Set' },
+      { reps: 10, weight: 49, role: 'Top-Set' },
+      { reps: 10, weight: 49, role: 'Top-Set' },
+      { reps: 10, weight: 49, role: 'Top-Set' },
     ] },
-    { name: 'Stirndruecken', saetze: 5, wdh: 18, pause: 2.5, start: 20, steig: 0.5, role: 'Kraftausdauer-Touch' },
+    { name: 'Skull Crushers', sets: 5, reps: 18, rest: 2.5, start: 20, increment: 0.5, role: 'Endurance-Touch' },
   ] },
-  { weekday: 6, name: 'Leg', focus: 'Hypertrophie', exercises: [
-    { ramp: true, name: 'LH Kniebeugen', pause: 2.5, sets: [
-      { wdh: 25, weight: 49, role: 'Warm-up' },
-      { wdh: 25, weight: 69, role: 'Warm-up' },
-      { wdh: 23, weight: 89, role: 'Warm-up' },
-      { wdh: 18, weight: 109, role: 'Warm-up' },
-      { wdh: 16, weight: 119, role: 'Top-Satz' },
-      { wdh: 16, weight: 119, role: 'Top-Satz' },
+  { weekday: 6, name: 'Legs', focus: 'Hypertrophy', exercises: [
+    { ramp: true, name: 'Barbell Squat', rest: 2.5, sets: [
+      { reps: 25, weight: 49, role: 'Warm-up' },
+      { reps: 25, weight: 69, role: 'Warm-up' },
+      { reps: 23, weight: 89, role: 'Warm-up' },
+      { reps: 18, weight: 109, role: 'Warm-up' },
+      { reps: 16, weight: 119, role: 'Top-Set' },
+      { reps: 16, weight: 119, role: 'Top-Set' },
     ] },
-    { name: 'Kreuzheben', saetze: 5, wdh: 10, pause: 2.5, start: 92, steig: 2.5 },
-    { name: 'LH Wadenheben', saetze: 5, wdh: 20, pause: 2.5, start: 119, steig: 1.25, role: 'Kraftausdauer-Touch' },
+    { name: 'Deadlift', sets: 5, reps: 10, rest: 2.5, start: 92, increment: 2.5 },
+    { name: 'Barbell Calf Raise', sets: 5, reps: 20, rest: 2.5, start: 119, increment: 1.25, role: 'Endurance-Touch' },
   ] },
-  { weekday: 7, name: 'Schulter', focus: 'Periodisiert', exercises: [
-    { phased: true, name: 'KH Schulterdruecken', saetze: 5, pause: 1.5, hyper: [11, 18], kraft: [6, 22], ausdauer: [22, 13] },
-    { phased: true, name: 'LH Schulterdruecken', saetze: 5, pause: 1.5, hyper: [10, 32], kraft: [6, 36], ausdauer: [18, 24] },
-    { phased: true, name: 'KH Seitheben', saetze: 5, pause: 1.5, hyper: [13, 15], kraft: [9, 17], ausdauer: [22, 11] },
-    { phased: true, name: 'KH vorg. Seitheben', saetze: 4, pause: 1.5, hyper: [13, 23], kraft: [9, 26], ausdauer: [19, 18] },
+  { weekday: 7, name: 'Shoulders', focus: 'Periodized', exercises: [
+    { phased: true, name: 'Dumbbell Shoulder Press', sets: 5, rest: 1.5, hyper: [11, 18], strength: [6, 22], endurance: [22, 13] },
+    { phased: true, name: 'Barbell Shoulder Press', sets: 5, rest: 1.5, hyper: [10, 32], strength: [6, 36], endurance: [18, 24] },
+    { phased: true, name: 'Dumbbell Lateral Raise', sets: 5, rest: 1.5, hyper: [13, 15], strength: [9, 17], endurance: [22, 11] },
+    { phased: true, name: 'Dumbbell Rear Delt Raise', sets: 4, rest: 1.5, hyper: [13, 23], strength: [9, 26], endurance: [19, 18] },
   ] },
 ];
 
 const PHASE_DEFS = [
-  { name: 'Hypertrophie', startWeek: 1, endWeek: 3, color: '#34d399', key: 'hyper' as const },
-  { name: 'Kraft', startWeek: 4, endWeek: 5, color: '#f87171', key: 'kraft' as const },
-  { name: 'Kraftausdauer', startWeek: 6, endWeek: 8, color: '#60a5fa', key: 'ausdauer' as const },
+  { name: 'Hypertrophy', startWeek: 1, endWeek: 3, color: '#34d399', key: 'hyper' as const },
+  { name: 'Strength', startWeek: 4, endWeek: 5, color: '#f87171', key: 'strength' as const },
+  { name: 'Strength-Endurance', startWeek: 6, endWeek: 8, color: '#60a5fa', key: 'endurance' as const },
 ];
 
 export function seedIfEmpty(db: BetterSQLite3Database<typeof schema>) {
@@ -92,11 +91,11 @@ export function seedIfEmpty(db: BetterSQLite3Database<typeof schema>) {
   db.transaction((tx) => {
     const cycleId = tx
       .insert(schema.cycles)
-      .values({ name: 'Zyklus 2026', startDate, lengthWeeks: 8, isActive: true })
+      .values({ name: 'Cycle 2026', startDate, lengthWeeks: 8, isActive: true })
       .returning({ id: schema.cycles.id })
       .get().id;
 
-    const phaseIds: Record<'hyper' | 'kraft' | 'ausdauer', number> = { hyper: 0, kraft: 0, ausdauer: 0 };
+    const phaseIds: Record<'hyper' | 'strength' | 'endurance', number> = { hyper: 0, strength: 0, endurance: 0 };
     PHASE_DEFS.forEach((p, i) => {
       phaseIds[p.key] = tx
         .insert(schema.phases)
@@ -113,13 +112,13 @@ export function seedIfEmpty(db: BetterSQLite3Database<typeof schema>) {
         .get().id;
 
       d.exercises.forEach((ex, ei) => {
-        let progressionType = 'konstant';
-        if ('phased' in ex) progressionType = 'phasen';
-        else if (!('ramp' in ex) && ex.steig > 0) progressionType = 'linear';
+        let progressionType = 'constant';
+        if ('phased' in ex) progressionType = 'phased';
+        else if (!('ramp' in ex) && ex.increment > 0) progressionType = 'linear';
 
         const exId = tx
           .insert(schema.exercises)
-          .values({ dayId, name: ex.name, progressionType, pauseMin: ex.pause ?? null, notes: null, orderIndex: ei + 1 })
+          .values({ dayId, name: ex.name, progressionType, pauseMin: ex.rest ?? null, notes: null, orderIndex: ei + 1 })
           .returning({ id: schema.exercises.id })
           .get().id;
 
@@ -130,10 +129,10 @@ export function seedIfEmpty(db: BetterSQLite3Database<typeof schema>) {
               .values({ exerciseId: exId, setIndex: si + 1, role: s.role || null })
               .returning({ id: schema.sets.id })
               .get().id;
-            tx.insert(schema.setTargets).values({ setId, phaseId: null, reps: s.wdh, baseWeight: s.weight, incrementPerWeek: 0 }).run();
+            tx.insert(schema.setTargets).values({ setId, phaseId: null, reps: s.reps, baseWeight: s.weight, incrementPerWeek: 0 }).run();
           });
         } else if ('phased' in ex) {
-          for (let si = 0; si < ex.saetze; si++) {
+          for (let si = 0; si < ex.sets; si++) {
             const setId = tx
               .insert(schema.sets)
               .values({ exerciseId: exId, setIndex: si + 1, role: null })
@@ -145,18 +144,18 @@ export function seedIfEmpty(db: BetterSQLite3Database<typeof schema>) {
             }
           }
         } else {
-          for (let si = 0; si < ex.saetze; si++) {
+          for (let si = 0; si < ex.sets; si++) {
             const setId = tx
               .insert(schema.sets)
               .values({ exerciseId: exId, setIndex: si + 1, role: ex.role || null })
               .returning({ id: schema.sets.id })
               .get().id;
-            tx.insert(schema.setTargets).values({ setId, phaseId: null, reps: ex.wdh, baseWeight: ex.start, incrementPerWeek: ex.steig || 0 }).run();
+            tx.insert(schema.setTargets).values({ setId, phaseId: null, reps: ex.reps, baseWeight: ex.start, incrementPerWeek: ex.increment || 0 }).run();
           }
         }
       });
     });
   });
 
-  console.log('Seeded initial cycle "Zyklus 2026".');
+  console.log('Seeded initial cycle "Cycle 2026".');
 }

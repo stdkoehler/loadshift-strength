@@ -15,10 +15,10 @@ import type { Day, ExerciseWithSets, FullPlan, Phase } from '@/lib/types';
 import type { ExerciseInput } from '@/zod/exercise.schema';
 import type { CyclePayload, DayPayload, PhasePayload } from './plan-editor-types';
 
-const WD: Record<number, string> = { 1: 'Montag', 2: 'Dienstag', 3: 'Mittwoch', 4: 'Donnerstag', 5: 'Freitag', 6: 'Samstag', 7: 'Sonntag' };
+const WD: Record<number, string> = { 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday', 7: 'Sunday' };
 
 function exSummary(ex: ExerciseWithSets): string {
-  if (ex.progressionType === 'phasen') return `Phasen-Welle · ${ex.sets.length} Saetze`;
+  if (ex.progressionType === 'phased') return `Phased Wave · ${ex.sets.length} sets`;
   const sets = ex.sets || [];
   const first = sets[0]?.targets?.[0];
   const firstRole = sets[0]?.role || null;
@@ -26,10 +26,10 @@ function exSummary(ex: ExerciseWithSets): string {
     (s) => s.targets?.[0]?.reps === first?.reps && s.targets?.[0]?.baseWeight === first?.baseWeight && (s.role || null) === firstRole
   );
   if (uniform && first) {
-    const inc = first.incrementPerWeek ? ` · +${fmt(first.incrementPerWeek)}/Wo` : '';
+    const inc = first.incrementPerWeek ? ` · +${fmt(first.incrementPerWeek)}/wk` : '';
     return `${sets.length} × ${first.reps ?? '–'} @ ${fmt(first.baseWeight)}kg${inc}`;
   }
-  return `Ramp · ${sets.length} Saetze`;
+  return `Ramp · ${sets.length} sets`;
 }
 
 /**
@@ -75,7 +75,7 @@ export function PlanEditor({
     setOpenModal(null);
   };
   const deleteExercise = async (exerciseId: number) => {
-    if (!confirm('Uebung loeschen?')) return;
+    if (!confirm('Delete exercise?')) return;
     await onDeleteExercise(exerciseId);
     setOpenModal(null);
   };
@@ -91,16 +91,16 @@ export function PlanEditor({
     <div className="flex flex-col">
       <div className="flex items-center justify-between px-4 py-3">
         <div>
-          <div className="text-xs uppercase tracking-wide text-neutral-500">{cycle.isTemplate ? 'Vorlage bearbeiten' : 'Plan bearbeiten'}</div>
+          <div className="text-xs uppercase tracking-wide text-neutral-500">{cycle.isTemplate ? 'Edit Template' : 'Edit Plan'}</div>
           <div className="text-base font-semibold text-neutral-100">{cycle.name}</div>
         </div>
         <div className="flex items-center gap-1">
-          <button type="button" title="Zyklus-Einstellungen" onClick={() => setOpenModal('cycle')} className="rounded-md px-2 py-1 text-neutral-400 hover:text-neutral-200">
+          <button type="button" title="Cycle Settings" onClick={() => setOpenModal('cycle')} className="rounded-md px-2 py-1 text-neutral-400 hover:text-neutral-200">
             <IconSettings width={18} height={18} />
           </button>
           {allowImportExport && (
             <>
-              <button type="button" title="Als JSON exportieren" onClick={() => setOpenModal('export')} className="rounded-md px-2 py-1 text-neutral-400 hover:text-neutral-200">
+              <button type="button" title="Export as JSON" onClick={() => setOpenModal('export')} className="rounded-md px-2 py-1 text-neutral-400 hover:text-neutral-200">
                 <IconDownload width={18} height={18} />
               </button>
               <ImportButton />
@@ -111,10 +111,10 @@ export function PlanEditor({
       </div>
 
       <div className="flex items-center gap-2 px-4 pb-2 text-xs text-neutral-500">
-        <span className="rounded-full bg-neutral-800 px-2 py-0.5">{cycle.lengthWeeks} Wochen</span>
+        <span className="rounded-full bg-neutral-800 px-2 py-0.5">{cycle.lengthWeeks} weeks</span>
         {cycle.startDate && <span className="rounded-full bg-neutral-800 px-2 py-0.5">Start {cycle.startDate}</span>}
         <button type="button" onClick={() => setOpenModal('phases')} className="ml-auto rounded-full bg-emerald-500/15 px-2 py-0.5 text-emerald-300">
-          Phasen
+          Phases
         </button>
       </div>
 
@@ -132,7 +132,7 @@ export function PlanEditor({
                 type="button"
                 onClick={() => setOpenModal({ type: 'day', dayId: day.id })}
                 className="ml-auto rounded-md px-2 py-1 text-neutral-500 hover:text-neutral-200"
-                aria-label="Tag bearbeiten"
+                aria-label="Edit day"
               >
                 <IconEdit width={16} height={16} />
               </button>
@@ -157,7 +157,7 @@ export function PlanEditor({
                           type="button"
                           onClick={() => setOpenModal({ type: 'exercise', dayId: day.id, exerciseId: ex.id })}
                           className="rounded-md px-2 py-1 text-neutral-500 hover:text-neutral-200"
-                          aria-label="Uebung bearbeiten"
+                          aria-label="Edit exercise"
                         >
                           <IconEdit width={16} height={16} />
                         </button>
@@ -174,10 +174,10 @@ export function PlanEditor({
                 onClick={() => setOpenModal({ type: 'exercise', dayId: day.id })}
                 className="mt-2 flex w-full items-center justify-center gap-1 rounded-md border border-dashed border-neutral-700 py-1.5 text-xs text-neutral-400"
               >
-                <IconPlus width={14} height={14} /> Uebung hinzufuegen
+                <IconPlus width={14} height={14} /> Add exercise
               </button>
             )}
-            {day.isRest && <div className="mt-2 pl-4 text-xs text-neutral-500">Ruhetag</div>}
+            {day.isRest && <div className="mt-2 pl-4 text-xs text-neutral-500">Rest day</div>}
           </div>
         ))}
 
@@ -186,7 +186,7 @@ export function PlanEditor({
           onClick={() => setOpenModal({ type: 'day' })}
           className="flex items-center justify-center gap-1 rounded-md border border-dashed border-neutral-700 py-2 text-sm text-neutral-400"
         >
-          <IconPlus width={16} height={16} /> Trainingstag hinzufuegen
+          <IconPlus width={16} height={16} /> Add training day
         </button>
       </div>
 

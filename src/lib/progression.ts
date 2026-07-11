@@ -1,6 +1,6 @@
-// Date <-> cycle-week helpers and Soll (target) computation.
+// Date <-> cycle-week helpers and target computation.
 
-export type ProgressionType = 'konstant' | 'linear' | 'phasen';
+export type ProgressionType = 'constant' | 'linear' | 'phased';
 
 export interface Phase {
   id: number;
@@ -59,7 +59,7 @@ export function round(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
-// If a cycle has a waveLengthWeeks set, phasen targets repeat every N weeks instead of
+// If a cycle has a waveLengthWeeks set, phased targets repeat every N weeks instead of
 // running once across the whole cycle - e.g. a 3-week DUP wave (waveLengthWeeks: 3) run
 // over a 12-week cycle plays week 1/2/3, then 1/2/3 again for weeks 4-6, etc. Phases are
 // still defined once with startWeek/endWeek inside that N-week window (1..N).
@@ -72,9 +72,9 @@ export function effectiveWeek(waveLengthWeeks: number | null | undefined, week: 
 }
 
 // Compute target weight & reps for a single set at a given cycle week.
-// setTargets: array of set_target rows for this set (1 row for konstant/linear, N rows keyed by phaseId for phasen)
-// `week` is the raw absolute cycle week (NOT pre-wrapped) - only the phasen branch below
-// wraps it via waveLengthWeeks; linear/konstant always use the absolute week, since their
+// setTargets: array of set_target rows for this set (1 row for constant/linear, N rows keyed by phaseId for phased)
+// `week` is the raw absolute cycle week (NOT pre-wrapped) - only the phased branch below
+// wraps it via waveLengthWeeks; linear/constant always use the absolute week, since their
 // progression should keep climbing across a cycle regardless of any wave repeat setting.
 export function computeTarget<T extends SetTarget, P extends Phase>(
   progressionType: ProgressionType,
@@ -85,7 +85,7 @@ export function computeTarget<T extends SetTarget, P extends Phase>(
 ): TargetResult {
   if (!setTargets || setTargets.length === 0) return { weight: null, reps: null, rir: null };
 
-  if (progressionType === 'phasen') {
+  if (progressionType === 'phased') {
     const effWeek = effectiveWeek(waveLengthWeeks, week);
     const phase = phaseForWeek(phases, effWeek);
     let t = phase ? setTargets.find((x) => x.phaseId === phase.id) : undefined;
@@ -111,6 +111,6 @@ export function computeTarget<T extends SetTarget, P extends Phase>(
     const weight = t.baseWeight == null ? null : round(t.baseWeight + (week - 1) * (t.incrementPerWeek || 0));
     return { weight, reps: t.reps ?? null, rir: t.targetRir ?? null };
   }
-  // konstant
+  // constant
   return { weight: t.baseWeight ?? null, reps: t.reps ?? null, rir: t.targetRir ?? null };
 }

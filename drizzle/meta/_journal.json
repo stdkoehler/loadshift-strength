@@ -29,6 +29,13 @@
       "when": 1783543051230,
       "tag": "0003_dapper_absorbing_man",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1783543051231,
+      "tag": "0004_rename_target_and_progression_type",
+      "breakpoints": true
     }
   ]
 }

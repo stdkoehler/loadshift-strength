@@ -9,7 +9,7 @@ export const cycles = sqliteTable('cycles', {
   // instance (isTemplate: false) does.
   startDate: text('start_date'),
   lengthWeeks: integer('length_weeks').notNull().default(8),
-  // If set, phasen-progression targets repeat every N weeks instead of running once
+  // If set, phased-progression targets repeat every N weeks instead of running once
   // linearly across the whole cycle (see effectiveWeek() in lib/progression.ts).
   waveLengthWeeks: integer('wave_length_weeks'),
   isActive: integer('is_active', { mode: 'boolean' }).notNull().default(false),
@@ -44,7 +44,7 @@ export const exercises = sqliteTable('exercises', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   dayId: integer('day_id').notNull().references(() => days.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
-  progressionType: text('progression_type').notNull().default('konstant'), // 'konstant' | 'linear' | 'phasen'
+  progressionType: text('progression_type').notNull().default('constant'), // 'constant' | 'linear' | 'phased'
   pauseMin: real('pause_min'),
   notes: text('notes'),
   orderIndex: integer('order_index').notNull(),
@@ -67,9 +67,9 @@ export const setTargets = sqliteTable('set_targets', {
   // Intended reps-in-reserve/RPE for this target. Store-and-display only - not used in
   // any weight/reps computation.
   targetRir: real('target_rir'),
-  // For phasen progression on a wave-repeating cycle (cycles.waveLengthWeeks): added to
+  // For phased progression on a wave-repeating cycle (cycles.waveLengthWeeks): added to
   // baseWeight once per full wave repeat, so the same 3-week (etc.) wave shape ratchets
-  // up instead of replaying identically forever. No-op outside phasen/wave-repeat.
+  // up instead of replaying identically forever. No-op outside phased/wave-repeat.
   incrementPerRepeat: real('increment_per_repeat').notNull().default(0),
 });
 
@@ -83,11 +83,11 @@ export const logs = sqliteTable('logs', {
   actualReps: integer('actual_reps'),
   actualWeight: real('actual_weight'),
   done: integer('done', { mode: 'boolean' }).notNull().default(false),
-  // Snapshot of the planned (soll) values at the moment this row was written, so a
+  // Snapshot of the planned (target) values at the moment this row was written, so a
   // day's history stays accurate even if the exercise's targets are edited later.
-  sollReps: integer('soll_reps'),
-  sollWeight: real('soll_weight'),
-  sollRir: real('soll_rir'),
+  targetReps: integer('target_reps'),
+  targetWeight: real('target_weight'),
+  targetRir: real('target_rir'),
 }, (t) => [unique('logs_exercise_set_date_unique').on(t.exerciseId, t.setIndex, t.logDate)]);
 
 // ---------- relations (for the relational query API: db.query.x.findMany({ with: {...} })) ----------

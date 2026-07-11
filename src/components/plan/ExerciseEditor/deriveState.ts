@@ -76,7 +76,7 @@ export function deriveState(initial: ExerciseWithSets | null, phases: Phase[]): 
 
   // uniform vs custom detection
   let uniform = true;
-  if (initial.progressionType === 'phasen') {
+  if (initial.progressionType === 'phased') {
     outer: for (const s of sets) {
       if (s.role) { uniform = false; break; }
       for (const p of phases) {

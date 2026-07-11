@@ -21,7 +21,7 @@ export function PlanView() {
   }
 
   if (cycle === null) return <EmptyState />;
-  if (!cycle) return <p className="px-4 py-6 text-sm text-neutral-500">Lade...</p>;
+  if (!cycle) return <p className="px-4 py-6 text-sm text-neutral-500">Loading...</p>;
 
   return (
     <>
@@ -31,7 +31,7 @@ export function PlanView() {
           <>
             <button
               type="button"
-              title="Als Vorlage speichern"
+              title="Save as Template"
               onClick={() => setOpenModal('saveAsTemplate')}
               className="rounded-md px-2 py-1 text-neutral-400 hover:text-neutral-200"
             >
@@ -42,7 +42,7 @@ export function PlanView() {
               onClick={() => setOpenModal('templates')}
               className="ml-1 rounded-md border border-neutral-700 px-2 py-1 text-xs text-neutral-300"
             >
-              Vorlagen
+              Templates
             </button>
           </>
         }

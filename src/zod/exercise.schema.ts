@@ -16,7 +16,7 @@ export const setInputSchema = z.object({
 
 export const exerciseInputSchema = z.object({
   name: z.string().min(1),
-  progressionType: z.enum(['konstant', 'linear', 'phasen']).default('konstant'),
+  progressionType: z.enum(['constant', 'linear', 'phased']).default('constant'),
   pauseMin: z.number().nullable().optional(),
   notes: z.string().nullable().optional(),
   sets: z.array(setInputSchema).default([]),

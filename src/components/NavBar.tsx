@@ -7,8 +7,8 @@ import { IconDumbbell, IconCalendar, IconChart, IconHistory } from '@/components
 const TABS = [
   { href: '/training', label: 'Training', Icon: IconDumbbell },
   { href: '/plan', label: 'Plan', Icon: IconCalendar },
-  { href: '/progress', label: 'Fortschritt', Icon: IconChart },
-  { href: '/verlauf', label: 'Verlauf', Icon: IconHistory },
+  { href: '/progress', label: 'Progress', Icon: IconChart },
+  { href: '/history', label: 'History', Icon: IconHistory },
 ];
 
 export function NavBar() {

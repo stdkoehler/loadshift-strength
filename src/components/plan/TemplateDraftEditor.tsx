@@ -12,8 +12,8 @@ import type { Phase } from '@/lib/types';
 
 /**
  * Wires PlanEditor to a local draft (see stores/template-draft-store.ts) instead of
- * the DB: every save/delete only mutates the draft in memory. "Speichern" persists the
- * whole draft in one go via replaceTemplateContentAction; "Verwerfen" just discards it.
+ * the DB: every save/delete only mutates the draft in memory. "Save" persists the
+ * whole draft in one go via replaceTemplateContentAction; "Discard" just discards it.
  */
 export function TemplateDraftEditor({ cycleId, onExit }: { cycleId: number; onExit: () => void }) {
   const queryClient = useQueryClient();
@@ -29,10 +29,10 @@ export function TemplateDraftEditor({ cycleId, onExit }: { cycleId: number; onEx
     if (sourcePlan && !draft) init(sourcePlan);
   }, [sourcePlan, draft, init]);
 
-  if (!draft) return <p className="px-4 py-6 text-sm text-neutral-500">Lade...</p>;
+  if (!draft) return <p className="px-4 py-6 text-sm text-neutral-500">Loading...</p>;
 
   const discard = () => {
-    if (dirty && !confirm('Ungespeicherte Aenderungen an dieser Vorlage verwerfen?')) return;
+    if (dirty && !confirm('Discard unsaved changes to this template?')) return;
     clear();
     onExit();
   };
@@ -56,7 +56,7 @@ export function TemplateDraftEditor({ cycleId, onExit }: { cycleId: number; onEx
             onClick={discard}
             className="ml-1 rounded-md border border-neutral-700 px-2 py-1 text-xs text-neutral-300"
           >
-            Verwerfen
+            Discard
           </button>
           <button
             type="button"
@@ -64,7 +64,7 @@ export function TemplateDraftEditor({ cycleId, onExit }: { cycleId: number; onEx
             onClick={save}
             className="ml-1 rounded-md bg-emerald-500 px-2 py-1 text-xs font-medium text-neutral-950 disabled:opacity-50"
           >
-            Speichern
+            Save
           </button>
         </>
       }

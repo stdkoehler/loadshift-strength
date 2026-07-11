@@ -28,7 +28,7 @@ export async function createDayAction(cycleId: number, input: unknown) {
 export async function updateDayAction(id: number, input: unknown) {
   const data = dayUpdateSchema.parse(input);
   const existing = (await db.select().from(days).where(eq(days.id, id)))[0];
-  if (!existing) throw new Error('Tag nicht gefunden');
+  if (!existing) throw new Error('Day not found');
   await db
     .update(days)
     .set({

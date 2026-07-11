@@ -32,10 +32,10 @@ export function CycleSettingsModal({
   const footer = (
     <>
       <button type="button" onClick={onClose} className="ml-auto rounded-md px-3 py-1.5 text-sm text-neutral-400">
-        Abbrechen
+        Cancel
       </button>
       <button type="button" onClick={save} className="rounded-md bg-emerald-500 px-3 py-1.5 text-sm font-medium text-neutral-950">
-        Speichern
+        Save
       </button>
     </>
   );
@@ -44,35 +44,35 @@ export function CycleSettingsModal({
   const labelClass = 'mb-1 block text-xs font-medium text-neutral-400';
 
   return (
-    <Modal title="Zyklus-Einstellungen" onClose={onClose} footer={footer}>
+    <Modal title="Cycle Settings" onClose={onClose} footer={footer}>
       <div>
         <label className={labelClass}>Name</label>
         <input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} />
       </div>
       {!cycle.isTemplate && (
         <div>
-          <label className={labelClass}>Startdatum (Montag Woche 1)</label>
+          <label className={labelClass}>Start date (Monday of week 1)</label>
           <DatePicker value={startDate} onChange={setStartDate} />
         </div>
       )}
       <div>
-        <label className={labelClass}>Laenge (Wochen)</label>
+        <label className={labelClass}>Length (weeks)</label>
         <input inputMode="numeric" className={inputClass} value={length} onChange={(e) => setLength(e.target.value)} />
       </div>
       <div>
-        <label className={labelClass}>Welle wiederholt sich alle N Wochen (optional)</label>
+        <label className={labelClass}>Wave repeats every N weeks (optional)</label>
         <input
           inputMode="numeric"
-          placeholder="leer = keine Wiederholung"
+          placeholder="empty = no repeat"
           className={inputClass}
           value={waveLength}
           onChange={(e) => setWaveLength(e.target.value)}
         />
       </div>
-      <p className="text-xs text-neutral-500">Das Startdatum bestimmt, welcher Kalendertag zu welcher Trainingswoche gehoert.</p>
+      <p className="text-xs text-neutral-500">The start date determines which calendar day belongs to which training week.</p>
       <p className="text-xs text-neutral-500">
-        Bei gesetzter Wellenlaenge N spielen Phasen-Wellen-Uebungen die Phasen 1..N immer wieder ab (z.B. eine 3-Wochen-Welle
-        ueber einen 12-Wochen-Zyklus), statt einmal linear durchzulaufen.
+        With a wave length of N set, phased-wave exercises replay phases 1..N over and over (e.g. a 3-week wave
+        over a 12-week cycle), instead of running through once linearly.
       </p>
     </Modal>
   );

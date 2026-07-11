@@ -6,7 +6,7 @@ import { Dropdown } from '@/components/ui/Dropdown';
 import type { Day } from '@/lib/types';
 import type { DayPayload } from './plan-editor-types';
 
-const WD: Record<number, string> = { 1: 'Montag', 2: 'Dienstag', 3: 'Mittwoch', 4: 'Donnerstag', 5: 'Freitag', 6: 'Samstag', 7: 'Sonntag' };
+const WD: Record<number, string> = { 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday', 7: 'Sunday' };
 const inputClass = 'w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-100';
 const labelClass = 'mb-1 block text-xs font-medium text-neutral-400';
 const segButtonClass = (active: boolean) =>
@@ -41,22 +41,22 @@ export function DayEditorModal({
     <>
       {onDelete && (
         <button type="button" onClick={del} className="rounded-md bg-red-500/15 px-3 py-1.5 text-sm text-red-400">
-          Loeschen
+          Delete
         </button>
       )}
       <button type="button" onClick={onClose} className="ml-auto rounded-md px-3 py-1.5 text-sm text-neutral-400">
-        Abbrechen
+        Cancel
       </button>
       <button type="button" onClick={save} className="rounded-md bg-emerald-500 px-3 py-1.5 text-sm font-medium text-neutral-950">
-        Speichern
+        Save
       </button>
     </>
   );
 
   return (
-    <Modal title={day ? 'Tag bearbeiten' : 'Neuer Trainingstag'} onClose={onClose} footer={footer}>
+    <Modal title={day ? 'Edit Day' : 'New Training Day'} onClose={onClose} footer={footer}>
       <div>
-        <label className={labelClass}>Wochentag</label>
+        <label className={labelClass}>Weekday</label>
         <Dropdown
           options={Object.entries(WD).map(([k, v]) => ({ value: Number(k), label: v }))}
           value={weekday}
@@ -64,18 +64,18 @@ export function DayEditorModal({
         />
       </div>
       <div>
-        <label className={labelClass}>Bezeichnung (Muskelgruppe)</label>
-        <input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} placeholder="z.B. Brust / Schulter" />
+        <label className={labelClass}>Label (muscle group)</label>
+        <input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Chest / Shoulders" />
       </div>
       <div>
-        <label className={labelClass}>Fokus (optional)</label>
-        <input className={inputClass} value={focus} onChange={(e) => setFocus(e.target.value)} placeholder="z.B. Kraft, Hypertrophie" />
+        <label className={labelClass}>Focus (optional)</label>
+        <input className={inputClass} value={focus} onChange={(e) => setFocus(e.target.value)} placeholder="e.g. Strength, Hypertrophy" />
       </div>
       <div>
-        <label className={labelClass}>Typ</label>
+        <label className={labelClass}>Type</label>
         <div className="flex gap-1">
-          <button type="button" className={segButtonClass(!isRest)} onClick={() => setIsRest(false)}>Trainingstag</button>
-          <button type="button" className={segButtonClass(isRest)} onClick={() => setIsRest(true)}>Ruhetag</button>
+          <button type="button" className={segButtonClass(!isRest)} onClick={() => setIsRest(false)}>Training Day</button>
+          <button type="button" className={segButtonClass(isRest)} onClick={() => setIsRest(true)}>Rest Day</button>
         </div>
       </div>
     </Modal>

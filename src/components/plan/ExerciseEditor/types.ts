@@ -1,6 +1,6 @@
 import type { ProgressionType } from '@/lib/progression';
 
-export const ROLES = ['', 'Warm-up', 'Top-Satz', 'Back-off', 'Kraftausdauer-Touch'] as const;
+export const ROLES = ['', 'Warm-up', 'Top-Set', 'Back-off', 'Endurance-Touch'] as const;
 
 export interface UniformVals {
   numSets: number | string;
@@ -40,7 +40,7 @@ export interface EditorState {
   custom: CustomRow[];
   phaseVals: Record<number, PhaseVal>;
   customPhase: CustomPhaseRow[];
-  // Phasen-only: added to every phase's baseWeight once per full wave repeat (see
+  // Phased-only: added to every phase's baseWeight once per full wave repeat (see
   // cycle.waveLengthWeeks) - shifts the whole wave up together rather than per-phase.
   repeatIncrement: number | string;
 }

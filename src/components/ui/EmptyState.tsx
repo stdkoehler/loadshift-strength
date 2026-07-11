@@ -14,7 +14,7 @@ export function EmptyState() {
   const createEmptyCycle = async () => {
     setBusy(true);
     try {
-      const cycle = await createCycleAction({ name: 'Neuer Zyklus', startDate: todayIso(), lengthWeeks: 8 });
+      const cycle = await createCycleAction({ name: 'New Cycle', startDate: todayIso(), lengthWeeks: 8 });
       await activateCycleAction(cycle.id);
       await queryClient.invalidateQueries({ queryKey: queryKeys.activeCycle() });
     } finally {
@@ -24,7 +24,7 @@ export function EmptyState() {
 
   return (
     <div className="flex flex-col items-center gap-4 px-6 py-16 text-center">
-      <p className="text-sm text-neutral-500">Kein aktiver Zyklus.</p>
+      <p className="text-sm text-neutral-500">No active cycle.</p>
       <div className="flex items-center gap-2">
         <button
           type="button"
@@ -32,9 +32,9 @@ export function EmptyState() {
           disabled={busy}
           className="rounded-md bg-emerald-500 px-3 py-1.5 text-sm font-medium text-neutral-950 disabled:opacity-50"
         >
-          Neuen Zyklus erstellen
+          Create New Cycle
         </button>
-        <span className="text-xs text-neutral-600">oder</span>
+        <span className="text-xs text-neutral-600">or</span>
         <span className="rounded-md border border-neutral-700 px-2 py-1.5">
           <ImportButton />
         </span>

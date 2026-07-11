@@ -28,7 +28,7 @@ export function PhasesEditorModal({
     await onSaveRow(row.id, { name: row.name, startWeek: Number(row.startWeek), endWeek: Number(row.endWeek), color: row.color });
   };
   const addRow = async () => {
-    const p = await onAddRow({ name: 'Neue Phase', startWeek: 1, endWeek: 1, color: '#7c5cff' });
+    const p = await onAddRow({ name: 'New Phase', startWeek: 1, endWeek: 1, color: '#7c5cff' });
     setRows((r) => [...r, p]);
   };
   const del = async (row: Phase) => {
@@ -38,13 +38,13 @@ export function PhasesEditorModal({
 
   const footer = (
     <button type="button" onClick={onClose} className="w-full rounded-md bg-emerald-500 px-3 py-1.5 text-sm font-medium text-neutral-950">
-      Fertig
+      Done
     </button>
   );
 
   return (
-    <Modal title="Periodisierungs-Phasen" onClose={onClose} footer={footer}>
-      <p className="text-xs text-neutral-500">Phasen steuern Phasen-Wellen-Uebungen. Wochenbereiche frei anpassbar.</p>
+    <Modal title="Periodization Phases" onClose={onClose} footer={footer}>
+      <p className="text-xs text-neutral-500">Phases control phased-wave exercises. Week ranges are freely adjustable.</p>
       {rows.map((row, i) => (
         <div key={row.id} className="flex flex-col gap-2 border-b border-neutral-800 pb-3">
           <div className="flex items-center gap-2">
@@ -64,21 +64,21 @@ export function PhasesEditorModal({
           </div>
           <div className="flex items-end gap-2">
             <div className="flex-1">
-              <label className={labelClass}>Von Woche</label>
+              <label className={labelClass}>From week</label>
               <input inputMode="numeric" className={inputClass} value={row.startWeek} onChange={(e) => update(i, { startWeek: Number(e.target.value) })} onBlur={() => saveRow(rows[i])} />
             </div>
             <div className="flex-1">
-              <label className={labelClass}>Bis Woche</label>
+              <label className={labelClass}>To week</label>
               <input inputMode="numeric" className={inputClass} value={row.endWeek} onChange={(e) => update(i, { endWeek: Number(e.target.value) })} onBlur={() => saveRow(rows[i])} />
             </div>
-            <button type="button" onClick={() => del(row)} className="rounded-md px-2 py-2 text-neutral-500 hover:text-red-400" aria-label="Phase loeschen">
+            <button type="button" onClick={() => del(row)} className="rounded-md px-2 py-2 text-neutral-500 hover:text-red-400" aria-label="Delete phase">
               ✕
             </button>
           </div>
         </div>
       ))}
       <button type="button" onClick={addRow} className="rounded-md border border-dashed border-neutral-700 py-2 text-sm text-neutral-400">
-        + Phase hinzufuegen
+        + Add phase
       </button>
     </Modal>
   );

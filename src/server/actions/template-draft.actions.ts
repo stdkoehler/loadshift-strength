@@ -10,10 +10,10 @@ import { templateDraftSchema } from '@/zod/template-draft.schema';
 // back onto the same cycle row. Templates are never logged against directly, so it's
 // safe to wipe and rebuild their phases/days (which cascade to exercises/sets/
 // set_targets) rather than diffing - the same pattern importCycleAction already uses
-// for "Vorlage laden", just targeting an existing cycleId instead of creating one.
+// for "Load Template", just targeting an existing cycleId instead of creating one.
 export async function replaceTemplateContentAction(cycleId: number, input: unknown) {
   const existing = await getCycle(cycleId);
-  if (!existing || !existing.isTemplate) throw new Error('Vorlage nicht gefunden');
+  if (!existing || !existing.isTemplate) throw new Error('Template not found');
 
   const data = templateDraftSchema.parse(input);
 

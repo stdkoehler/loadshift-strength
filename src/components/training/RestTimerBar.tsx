@@ -37,7 +37,7 @@ export function RestTimerBar() {
       if (secondsLeft === 0 && !firedRef.current) {
         firedRef.current = true;
         startAlarmLoop();
-        notifyRestOver(label ? `${label} - naechster Satz` : 'Zeit fuer den naechsten Satz');
+        notifyRestOver(label ? `${label} - next set` : 'Time for the next set');
         stopBackgroundKeepAlive();
         setRinging(true);
       }
@@ -72,7 +72,7 @@ export function RestTimerBar() {
         onClick={acknowledge}
         className="w-full animate-pulse border-t border-emerald-500 bg-emerald-500/20 px-4 py-3 text-center text-sm font-semibold text-emerald-300"
       >
-        Pause vorbei{label ? ` · ${label}` : ''} — antippen zum Bestaetigen
+        Rest over{label ? ` · ${label}` : ''} — tap to acknowledge
       </button>
     );
   }
@@ -84,7 +84,7 @@ export function RestTimerBar() {
       <div className="mx-auto flex w-full max-w-[900px] items-center gap-3">
         <div className="flex-1">
           <div className="flex items-center justify-between text-xs text-neutral-400">
-            <span>{label ? `Pause · ${label}` : 'Pause'}</span>
+            <span>{label ? `Rest · ${label}` : 'Rest'}</span>
             <span className="font-mono text-sm text-neutral-100">{formatTime(remaining)}</span>
           </div>
           <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-neutral-800">
@@ -103,7 +103,7 @@ export function RestTimerBar() {
         </button>
         <button
           type="button"
-          aria-label="Pause abbrechen"
+          aria-label="Cancel rest"
           onClick={() => {
             cancel();
             stopBackgroundKeepAlive();

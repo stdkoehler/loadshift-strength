@@ -24,12 +24,12 @@ describe('weekdayFor', () => {
 
 describe('phaseForWeek', () => {
   const phases: Phase[] = [
-    { id: 1, name: 'Hypertrophie', startWeek: 1, endWeek: 3, color: null },
-    { id: 2, name: 'Kraft', startWeek: 4, endWeek: 5, color: null },
+    { id: 1, name: 'Hypertrophy', startWeek: 1, endWeek: 3, color: null },
+    { id: 2, name: 'Strength', startWeek: 4, endWeek: 5, color: null },
   ];
   it('finds the phase containing the week', () => {
-    expect(phaseForWeek(phases, 2)?.name).toBe('Hypertrophie');
-    expect(phaseForWeek(phases, 4)?.name).toBe('Kraft');
+    expect(phaseForWeek(phases, 2)?.name).toBe('Hypertrophy');
+    expect(phaseForWeek(phases, 4)?.name).toBe('Strength');
   });
   it('returns null when no phase covers the week', () => {
     expect(phaseForWeek(phases, 10)).toBeNull();
@@ -38,18 +38,18 @@ describe('phaseForWeek', () => {
 
 describe('computeTarget', () => {
   it('returns nulls when there are no set targets', () => {
-    expect(computeTarget('konstant', [], [], 1)).toEqual({ weight: null, reps: null, rir: null });
+    expect(computeTarget('constant', [], [], 1)).toEqual({ weight: null, reps: null, rir: null });
   });
 
-  it('konstant: same weight/reps regardless of week', () => {
+  it('constant: same weight/reps regardless of week', () => {
     const targets: SetTarget[] = [{ phaseId: null, reps: 10, baseWeight: 50, incrementPerWeek: 0 }];
-    expect(computeTarget('konstant', targets, [], 1)).toEqual({ weight: 50, reps: 10, rir: null });
-    expect(computeTarget('konstant', targets, [], 5)).toEqual({ weight: 50, reps: 10, rir: null });
+    expect(computeTarget('constant', targets, [], 1)).toEqual({ weight: 50, reps: 10, rir: null });
+    expect(computeTarget('constant', targets, [], 5)).toEqual({ weight: 50, reps: 10, rir: null });
   });
 
-  it('konstant: passes targetRir through unchanged', () => {
+  it('constant: passes targetRir through unchanged', () => {
     const targets: SetTarget[] = [{ phaseId: null, reps: 10, baseWeight: 50, incrementPerWeek: 0, targetRir: 2 }];
-    expect(computeTarget('konstant', targets, [], 1)).toEqual({ weight: 50, reps: 10, rir: 2 });
+    expect(computeTarget('constant', targets, [], 1)).toEqual({ weight: 50, reps: 10, rir: 2 });
   });
 
   it('linear: weight increases by increment_per_week for each week past week 1', () => {
@@ -58,29 +58,29 @@ describe('computeTarget', () => {
     expect(computeTarget('linear', targets, [], 4)).toEqual({ weight: 107.5, reps: 8, rir: null });
   });
 
-  it('phasen: picks the target row matching the current phase', () => {
+  it('phased: picks the target row matching the current phase', () => {
     const phases: Phase[] = [
-      { id: 1, name: 'Hypertrophie', startWeek: 1, endWeek: 3, color: null },
-      { id: 2, name: 'Kraft', startWeek: 4, endWeek: 5, color: null },
+      { id: 1, name: 'Hypertrophy', startWeek: 1, endWeek: 3, color: null },
+      { id: 2, name: 'Strength', startWeek: 4, endWeek: 5, color: null },
     ];
     const targets: SetTarget[] = [
       { phaseId: 1, reps: 15, baseWeight: 39, incrementPerWeek: 0, targetRir: 3 },
       { phaseId: 2, reps: 6, baseWeight: 149, incrementPerWeek: 0, targetRir: 1 },
     ];
-    expect(computeTarget('phasen', targets, phases, 2)).toEqual({ weight: 39, reps: 15, phase: 'Hypertrophie', rir: 3 });
-    expect(computeTarget('phasen', targets, phases, 4)).toEqual({ weight: 149, reps: 6, phase: 'Kraft', rir: 1 });
+    expect(computeTarget('phased', targets, phases, 2)).toEqual({ weight: 39, reps: 15, phase: 'Hypertrophy', rir: 3 });
+    expect(computeTarget('phased', targets, phases, 4)).toEqual({ weight: 149, reps: 6, phase: 'Strength', rir: 1 });
   });
 
-  it('phasen: falls back to the first target row when no phase matches the week', () => {
-    const phases: Phase[] = [{ id: 1, name: 'Hypertrophie', startWeek: 1, endWeek: 3, color: null }];
+  it('phased: falls back to the first target row when no phase matches the week', () => {
+    const phases: Phase[] = [{ id: 1, name: 'Hypertrophy', startWeek: 1, endWeek: 3, color: null }];
     const targets: SetTarget[] = [{ phaseId: 1, reps: 15, baseWeight: 39, incrementPerWeek: 0 }];
-    expect(computeTarget('phasen', targets, phases, 10)).toEqual({ weight: 39, reps: 15, phase: null, rir: null });
+    expect(computeTarget('phased', targets, phases, 10)).toEqual({ weight: 39, reps: 15, phase: null, rir: null });
   });
 
-  it('phasen: applies increment_per_week within the phase', () => {
-    const phases: Phase[] = [{ id: 1, name: 'Kraft', startWeek: 4, endWeek: 6, color: null }];
+  it('phased: applies increment_per_week within the phase', () => {
+    const phases: Phase[] = [{ id: 1, name: 'Strength', startWeek: 4, endWeek: 6, color: null }];
     const targets: SetTarget[] = [{ phaseId: 1, reps: 6, baseWeight: 140, incrementPerWeek: 2 }];
-    expect(computeTarget('phasen', targets, phases, 6)).toEqual({ weight: 144, reps: 6, phase: 'Kraft', rir: null });
+    expect(computeTarget('phased', targets, phases, 6)).toEqual({ weight: 144, reps: 6, phase: 'Strength', rir: null });
   });
 });
 
@@ -99,7 +99,7 @@ describe('effectiveWeek', () => {
     expect(effectiveWeek(3, 7)).toBe(1);
   });
 
-  it('lets a phasen wave repeat across a longer cycle', () => {
+  it('lets a phased wave repeat across a longer cycle', () => {
     const phases: Phase[] = [
       { id: 1, name: 'W1', startWeek: 1, endWeek: 1, color: null },
       { id: 2, name: 'W2', startWeek: 2, endWeek: 2, color: null },
@@ -112,8 +112,8 @@ describe('effectiveWeek', () => {
     ];
     // week 4 of an 8-week cycle should replay W1's target, same as week 1 -
     // pass the raw absolute week plus waveLengthWeeks; computeTarget wraps internally.
-    const week1 = computeTarget('phasen', targets, phases, 1, 3);
-    const week4 = computeTarget('phasen', targets, phases, 4, 3);
+    const week1 = computeTarget('phased', targets, phases, 1, 3);
+    const week4 = computeTarget('phased', targets, phases, 4, 3);
     expect(week4).toEqual(week1);
     expect(week4.weight).toBe(80);
   });
@@ -132,21 +132,21 @@ describe('computeTarget with incrementPerRepeat (wave ratchet)', () => {
   ];
 
   it('adds nothing on the first pass through the wave (repeatIndex 0)', () => {
-    expect(computeTarget('phasen', targets, phases, 1, 3).weight).toBe(80);
-    expect(computeTarget('phasen', targets, phases, 3, 3).weight).toBe(90);
+    expect(computeTarget('phased', targets, phases, 1, 3).weight).toBe(80);
+    expect(computeTarget('phased', targets, phases, 3, 3).weight).toBe(90);
   });
 
   it('adds incrementPerRepeat once per full wave repeat', () => {
     // weeks 4-6 = repeat 1 -> +2.5; weeks 7-9 = repeat 2 -> +5
-    expect(computeTarget('phasen', targets, phases, 4, 3).weight).toBe(82.5);
-    expect(computeTarget('phasen', targets, phases, 6, 3).weight).toBe(92.5);
-    expect(computeTarget('phasen', targets, phases, 7, 3).weight).toBe(85);
+    expect(computeTarget('phased', targets, phases, 4, 3).weight).toBe(82.5);
+    expect(computeTarget('phased', targets, phases, 6, 3).weight).toBe(92.5);
+    expect(computeTarget('phased', targets, phases, 7, 3).weight).toBe(85);
   });
 
   it('is a no-op without waveLengthWeeks (falls back to the first target row, no repeat math)', () => {
     // No waveLengthWeeks passed -> repeatIndex is always 0, and week 4 matches no phase
     // (phases only cover 1-3) so it falls back to targets[0] (W1, 80) unmodified.
-    expect(computeTarget('phasen', targets, phases, 4).weight).toBe(80);
+    expect(computeTarget('phased', targets, phases, 4).weight).toBe(80);
   });
 
   it('linear progression ignores waveLengthWeeks entirely (keeps climbing, does not wrap)', () => {

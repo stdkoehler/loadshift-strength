@@ -17,8 +17,8 @@ export function ImportButton() {
     if (!file) return;
     if (
       !confirm(
-        'Import erstellt einen NEUEN Zyklus aus dieser Datei und aktiviert ihn sofort ' +
-          '(der aktuelle Zyklus bleibt erhalten, wird aber nicht mehr angezeigt). Fortfahren?'
+        'Import creates a NEW cycle from this file and activates it immediately ' +
+          '(the current cycle is kept, but is no longer shown). Continue?'
       )
     ) {
       return;
@@ -30,7 +30,7 @@ export function ImportButton() {
       await importCycleAction(data, { activate: true });
       await queryClient.invalidateQueries({ queryKey: queryKeys.activeCycle() });
     } catch (err) {
-      alert('Import fehlgeschlagen: ' + (err instanceof Error ? err.message : String(err)));
+      alert('Import failed: ' + (err instanceof Error ? err.message : String(err)));
     } finally {
       setBusy(false);
     }
@@ -42,7 +42,7 @@ export function ImportButton() {
         type="button"
         onClick={() => fileInputRef.current?.click()}
         disabled={busy}
-        title="Aus JSON importieren"
+        title="Import from JSON"
         className="rounded-md px-2 py-1 text-neutral-400 hover:text-neutral-200 disabled:opacity-50"
       >
         <IconUpload width={18} height={18} />

@@ -26,7 +26,7 @@ export function ExportModal({ cycle, onClose }: { cycle: Cycle; onClose: () => v
       URL.revokeObjectURL(url);
       onClose();
     } catch (err) {
-      alert('Export fehlgeschlagen: ' + (err instanceof Error ? err.message : String(err)));
+      alert('Export failed: ' + (err instanceof Error ? err.message : String(err)));
     } finally {
       setBusy(false);
     }
@@ -35,10 +35,10 @@ export function ExportModal({ cycle, onClose }: { cycle: Cycle; onClose: () => v
   const footer = (
     <>
       <button type="button" onClick={onClose} className="ml-auto rounded-md px-3 py-1.5 text-sm text-neutral-400">
-        Abbrechen
+        Cancel
       </button>
       <button type="button" disabled={busy} onClick={doExport} className="rounded-md bg-emerald-500 px-3 py-1.5 text-sm font-medium text-neutral-950 disabled:opacity-50">
-        Exportieren
+        Export
       </button>
     </>
   );
@@ -47,18 +47,18 @@ export function ExportModal({ cycle, onClose }: { cycle: Cycle; onClose: () => v
     `flex-1 rounded-md px-3 py-1.5 text-sm font-medium ${active ? 'bg-emerald-500 text-neutral-950' : 'bg-neutral-800 text-neutral-400'}`;
 
   return (
-    <Modal title="Plan exportieren" onClose={onClose} footer={footer}>
+    <Modal title="Export Plan" onClose={onClose} footer={footer}>
       <div>
-        <label className="mb-1 block text-xs font-medium text-neutral-400">Was soll exportiert werden?</label>
+        <label className="mb-1 block text-xs font-medium text-neutral-400">What should be exported?</label>
         <div className="flex gap-1">
-          <button type="button" className={segButtonClass(!includeLogs)} onClick={() => setIncludeLogs(false)}>Nur Plan</button>
-          <button type="button" className={segButtonClass(includeLogs)} onClick={() => setIncludeLogs(true)}>Plan + Fortschritt</button>
+          <button type="button" className={segButtonClass(!includeLogs)} onClick={() => setIncludeLogs(false)}>Plan only</button>
+          <button type="button" className={segButtonClass(includeLogs)} onClick={() => setIncludeLogs(true)}>Plan + Progress</button>
         </div>
       </div>
       <p className="text-xs text-neutral-500">
-        Der Export enthaelt Tage, Uebungen, Saetze und Periodisierungs-Phasen als JSON-Datei.
-        {includeLogs ? ' Zusaetzlich alle bisher geloggten Ist-Werte.' : ' Ohne geloggte Ist-Werte.'}
-        {' '}Beim spaeteren Import entsteht daraus ein neuer, aktiver Zyklus.
+        The export contains days, exercises, sets, and periodization phases as a JSON file.
+        {includeLogs ? ' Plus all actual values logged so far.' : ' Without logged actual values.'}
+        {' '}Importing it later creates a new, active cycle.
       </p>
     </Modal>
   );

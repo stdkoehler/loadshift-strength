@@ -52,23 +52,23 @@ export async function getSessionForDate(cycleId: number, dateIso: string): Promi
       const actualWeight = log?.actualWeight ?? null;
       const actualReps = log?.actualReps ?? null;
       // Once a set has been logged, its planned values are frozen in the log row
-      // (soll* columns) so history stays accurate even if the exercise's targets are
+      // (target* columns) so history stays accurate even if the exercise's targets are
       // edited later. Unlogged sets keep showing the live, currently-computed target.
-      const usedSollReps = log?.sollReps ?? reps;
-      const usedSollWeight = log?.sollWeight ?? weight;
-      const usedSollRir = log?.sollRir ?? rir;
-      const usedWeight = actualWeight ?? usedSollWeight;
-      const usedReps = actualReps ?? usedSollReps;
+      const usedTargetReps = log?.targetReps ?? reps;
+      const usedTargetWeight = log?.targetWeight ?? weight;
+      const usedTargetRir = log?.targetRir ?? rir;
+      const usedWeight = actualWeight ?? usedTargetWeight;
+      const usedReps = actualReps ?? usedTargetReps;
       const volume = (usedWeight || 0) * (usedReps || 0);
       dayVolume += volume;
       return {
         setIndex: s.setIndex,
         role: s.role,
-        sollReps: usedSollReps,
-        sollWeight: usedSollWeight,
-        sollRir: usedSollRir,
-        istReps: actualReps,
-        istWeight: actualWeight,
+        targetReps: usedTargetReps,
+        targetWeight: usedTargetWeight,
+        targetRir: usedTargetRir,
+        actualReps: actualReps,
+        actualWeight: actualWeight,
         done: log ? log.done : false,
         volume: Math.round(volume),
       };

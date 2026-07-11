@@ -23,7 +23,7 @@ export async function createCycleAction(input: unknown) {
 export async function updateCycleAction(id: number, input: unknown) {
   const data = cycleUpdateSchema.parse(input);
   const existing = await getCycle(id);
-  if (!existing) throw new Error('Zyklus nicht gefunden');
+  if (!existing) throw new Error('Cycle not found');
   await db
     .update(cycles)
     .set({
@@ -37,11 +37,11 @@ export async function updateCycleAction(id: number, input: unknown) {
 }
 
 export async function deleteCycleAction(id: number) {
-  // Any cycle with at least one log is permanent history (see the Verlauf tab) - never
+  // Any cycle with at least one log is permanent history (see the History tab) - never
   // let it cascade-delete via a plan cleanup. Templates never have logs against them
   // directly, so this only ever blocks deleting a loaded/run plan instance.
   if (await cycleHasLogs(id)) {
-    throw new Error('Dieser Plan hat bereits geloggte Trainingstage und kann nicht geloescht werden.');
+    throw new Error('This plan already has logged training days and cannot be deleted.');
   }
   await db.delete(cycles).where(eq(cycles.id, id));
   return { ok: true };
@@ -49,8 +49,8 @@ export async function deleteCycleAction(id: number) {
 
 export async function activateCycleAction(id: number) {
   const cycle = await getCycle(id);
-  if (!cycle) throw new Error('Zyklus nicht gefunden');
-  if (cycle.isTemplate) throw new Error('Eine Vorlage kann nicht direkt aktiviert werden - erst laden.');
+  if (!cycle) throw new Error('Cycle not found');
+  if (cycle.isTemplate) throw new Error('A template cannot be activated directly - load it first.');
   db.transaction((tx) => {
     tx.update(cycles).set({ isActive: false }).run();
     tx.update(cycles).set({ isActive: true }).where(eq(cycles.id, id)).run();

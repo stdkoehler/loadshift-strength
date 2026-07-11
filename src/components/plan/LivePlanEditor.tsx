@@ -28,7 +28,7 @@ export function LivePlanEditor({ cycleId, headerExtra }: { cycleId: number; head
   const invalidatePlan = () => queryClient.invalidateQueries({ queryKey: queryKeys.plan(cycleId) });
   const invalidateCycle = () => queryClient.invalidateQueries({ queryKey: queryKeys.activeCycle() });
 
-  if (!plan) return <p className="px-4 py-6 text-sm text-neutral-500">Lade...</p>;
+  if (!plan) return <p className="px-4 py-6 text-sm text-neutral-500">Loading...</p>;
 
   return (
     <PlanEditor

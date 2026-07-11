@@ -16,10 +16,10 @@ const GRID = '#404040';
 const TEXT = '#737373';
 
 const LABELS: Record<string, string> = {
-  sollTop: 'Soll',
-  istTop: 'Ist',
-  volumeSoll: 'Soll',
-  volumeIst: 'Ist',
+  targetTop: 'Target',
+  actualTop: 'Actual',
+  volumeTarget: 'Target',
+  volumeActual: 'Actual',
 };
 
 const tooltipContentStyle = {
@@ -32,10 +32,10 @@ const tooltipContentStyle = {
 const tooltipLabelStyle = { color: '#a3a3a3' };
 const tooltipItemStyle = { color: '#e5e5e5' };
 
-// Datum-keyed data (Verlauf) shows the ISO date as-is; week-keyed data (Fortschritt)
-// prefixes it with "Woche".
+// Date-keyed data (History) shows the ISO date as-is; week-keyed data (Progress)
+// prefixes it with "Week".
 function labelFor(xKey: string, value: unknown) {
-  return xKey === 'week' ? `Woche ${value}` : String(value);
+  return xKey === 'week' ? `Week ${value}` : String(value);
 }
 
 export function LineChart<T extends object>({

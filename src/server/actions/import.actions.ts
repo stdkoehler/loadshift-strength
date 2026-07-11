@@ -12,7 +12,7 @@ export async function importCycleAction(
   { activate = true, isTemplate = false }: { activate?: boolean; isTemplate?: boolean } = {}
 ) {
   if (!input || typeof input !== 'object' || (input as { format?: unknown }).format !== EXPORT_FORMAT) {
-    throw new Error('Ungueltiges Plan-Format');
+    throw new Error('Invalid plan format');
   }
   const data = importPayloadSchema.parse(input);
 
@@ -20,7 +20,7 @@ export async function importCycleAction(
     const newCycleId = tx
       .insert(cycles)
       .values({
-        name: data.cycle.name || 'Importierter Zyklus',
+        name: data.cycle.name || 'Imported Cycle',
         startDate: isTemplate ? null : data.cycle.startDate,
         lengthWeeks: data.cycle.lengthWeeks || 8,
         waveLengthWeeks: data.cycle.waveLengthWeeks ?? null,

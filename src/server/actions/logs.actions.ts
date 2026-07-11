@@ -12,11 +12,11 @@ import { logInputSchema } from '@/zod/log.schema';
 export async function upsertLogAction(input: unknown) {
   const data = logInputSchema.parse(input);
   if (data.logDate !== todayIso()) {
-    throw new Error('Nur der heutige Tag kann protokolliert werden.');
+    throw new Error('Only the current day can be logged.');
   }
 
   const cycle = await getActiveCycle();
-  if (!cycle || !cycle.startDate) throw new Error('Kein aktiver Zyklus');
+  if (!cycle || !cycle.startDate) throw new Error('No active cycle');
 
   const weekNumber = weekNumberFor(cycle.startDate, data.logDate);
   const isEmpty = (data.actualReps == null) && (data.actualWeight == null) && !data.done;
@@ -32,10 +32,10 @@ export async function upsertLogAction(input: unknown) {
     where: eq(exercises.id, data.exerciseId),
     with: { sets: { where: eq(sets.setIndex, data.setIndex), with: { targets: true } } },
   });
-  if (!exercise) throw new Error('Uebung nicht gefunden');
+  if (!exercise) throw new Error('Exercise not found');
   const setRow = exercise.sets[0];
   const phaseRows = await getPhases(cycle.id);
-  const soll = setRow
+  const target = setRow
     ? computeTarget(exercise.progressionType as ProgressionType, setRow.targets, phaseRows, weekNumber, cycle.waveLengthWeeks)
     : { weight: null, reps: null, rir: null };
 
@@ -50,9 +50,9 @@ export async function upsertLogAction(input: unknown) {
       actualReps: data.actualReps ?? null,
       actualWeight: data.actualWeight ?? null,
       done: data.done,
-      sollReps: soll.reps,
-      sollWeight: soll.weight,
-      sollRir: soll.rir,
+      targetReps: target.reps,
+      targetWeight: target.weight,
+      targetRir: target.rir,
     })
     .onConflictDoUpdate({
       target: [logs.exerciseId, logs.setIndex, logs.logDate],
@@ -61,9 +61,9 @@ export async function upsertLogAction(input: unknown) {
         actualWeight: data.actualWeight ?? null,
         done: data.done,
         weekNumber,
-        sollReps: soll.reps,
-        sollWeight: soll.weight,
-        sollRir: soll.rir,
+        targetReps: target.reps,
+        targetWeight: target.weight,
+        targetRir: target.rir,
       },
     });
 

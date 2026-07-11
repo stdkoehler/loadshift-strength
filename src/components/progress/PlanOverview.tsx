@@ -5,7 +5,7 @@ import { computeTarget, weekNumberFor, weekdayFor, effectiveWeek, phaseForWeek }
 import { todayIso } from '@/lib/date';
 import type { FullPlan, ExerciseWithSets, Phase } from '@/lib/types';
 
-const WD: Record<number, string> = { 1: 'Mo', 2: 'Di', 3: 'Mi', 4: 'Do', 5: 'Fr', 6: 'Sa', 7: 'So' };
+const WD: Record<number, string> = { 1: 'Mon', 2: 'Tue', 3: 'Wed', 4: 'Thu', 5: 'Fri', 6: 'Sat', 7: 'Sun' };
 const FALLBACK_COLORS = ['#2a78d6', '#eb6834', '#eda100', '#1baf7a', '#4a3aa7', '#e34948'];
 
 // Sequential emerald ramp (the app's signature accent) tuned for the dark surface.
@@ -74,7 +74,7 @@ function intensityFromReps(reps: number): number {
 function primarySet(ex: ExerciseWithSets) {
   const working = ex.sets.filter((s) => s.role !== 'Warm-up');
   const pool = working.length ? working : ex.sets;
-  return pool.find((s) => s.role === 'Top-Satz') ?? pool[0];
+  return pool.find((s) => s.role === 'Top-Set') ?? pool[0];
 }
 
 interface WeekCell {
@@ -89,7 +89,7 @@ function weeklyValues(ex: ExerciseWithSets, phases: Phase[], waveLengthWeeks: nu
   if (!set || !set.targets.length) return [];
   const cells: WeekCell[] = [];
   for (let week = 1; week <= lengthWeeks; week++) {
-    const r = computeTarget(ex.progressionType as 'konstant' | 'linear' | 'phasen', set.targets, phases, week, waveLengthWeeks);
+    const r = computeTarget(ex.progressionType as 'constant' | 'linear' | 'phased', set.targets, phases, week, waveLengthWeeks);
     cells.push({ week, weight: r.weight, reps: r.reps, phase: r.phase ?? null });
   }
   return cells;
@@ -133,7 +133,7 @@ function ExerciseHeatRow({
                   onFocus={() => setActiveWeek(c.week)}
                   onBlur={() => setActiveWeek(null)}
                   onClick={() => setActiveWeek(c.week)}
-                  aria-label={`Woche ${c.week}${c.phase ? ` · ${c.phase}` : ''}: ${fmt(c.weight)}kg × ${c.reps ?? '–'}`}
+                  aria-label={`Week ${c.week}${c.phase ? ` · ${c.phase}` : ''}: ${fmt(c.weight)}kg × ${c.reps ?? '–'}`}
                   className={`min-w-0 flex-1 rounded-[2px] outline-none ${isMarker ? 'ring-1 ring-neutral-100/70' : ''}`}
                   style={{ background: c.reps == null ? '#3f3f46' : heatColor(intensityFromReps(c.reps)) }}
                 />
@@ -143,7 +143,7 @@ function ExerciseHeatRow({
           <div className="mt-0.5 h-3 truncate text-neutral-500">
             {shown ? (
               <>
-                Wo {shown.week}
+                Wk {shown.week}
                 {shown.phase ? ` · ${shown.phase}` : ''} · {fmt(shown.weight)}kg × {shown.reps ?? '–'}
               </>
             ) : (
@@ -179,10 +179,10 @@ export function PlanOverview({ plan }: { plan: FullPlan }) {
     <div className="flex flex-col gap-3 rounded-xl border border-neutral-800 bg-neutral-900/60 p-3">
       <div>
         <div className="flex items-center justify-between">
-          <h4 className="text-sm font-semibold text-neutral-100">Plan-Uebersicht</h4>
+          <h4 className="text-sm font-semibold text-neutral-100">Plan Overview</h4>
           {absWeek != null && (
             <span className="text-xs text-neutral-400">
-              Woche {absWeek} von {cycle.lengthWeeks}
+              Week {absWeek} of {cycle.lengthWeeks}
               {currentPhase ? ` · ${currentPhase.name}` : ''}
             </span>
           )}
@@ -198,7 +198,7 @@ export function PlanOverview({ plan }: { plan: FullPlan }) {
                 return (
                   <div
                     key={p.id}
-                    title={`${p.name} (Wo ${p.startWeek}–${p.endWeek})`}
+                    title={`${p.name} (Wk ${p.startWeek}–${p.endWeek})`}
                     className={`h-full ${i === 0 ? 'rounded-l-full' : ''} ${i === sortedPhases.length - 1 ? 'rounded-r-full' : ''}`}
                     style={{ width: `${widthPct}%`, background: color }}
                   />
@@ -206,7 +206,7 @@ export function PlanOverview({ plan }: { plan: FullPlan }) {
               })}
               {markerWeek != null && (
                 <div
-                  title={`Heute · Woche ${markerWeek}`}
+                  title={`Today · Week ${markerWeek}`}
                   className="pointer-events-none absolute -top-1.5 flex -translate-x-1/2 flex-col items-center"
                   style={{ left: `${Math.min(Math.max(((markerWeek - 0.5) / totalWeeks) * 100, 0), 100)}%` }}
                 >
@@ -227,7 +227,7 @@ export function PlanOverview({ plan }: { plan: FullPlan }) {
               })}
             </div>
             {cycle.waveLengthWeeks ? (
-              <p className="mt-1 text-[11px] text-neutral-500">Welle wiederholt sich alle {cycle.waveLengthWeeks} Wochen</p>
+              <p className="mt-1 text-[11px] text-neutral-500">Wave repeats every {cycle.waveLengthWeeks} weeks</p>
             ) : null}
           </div>
         )}
@@ -236,7 +236,7 @@ export function PlanOverview({ plan }: { plan: FullPlan }) {
       <div className="flex items-center gap-2 text-[10px] text-neutral-500">
         <span>Stimulus:</span>
         <div className="h-2 w-20 rounded-full" style={{ background: 'linear-gradient(90deg, rgb(25,70,55), rgb(18,150,100), rgb(52,211,153))' }} />
-        <span>leicht (viele Wdh) → schwer (wenig Wdh)</span>
+        <span>light (high reps) → heavy (low reps)</span>
       </div>
 
       <div className="app-scroll-x -mx-1 flex gap-2 overflow-x-auto px-1 pb-2">
@@ -255,7 +255,7 @@ export function PlanOverview({ plan }: { plan: FullPlan }) {
               </div>
 
               {day.isRest ? (
-                <p className="mt-1.5 text-[11px] text-neutral-500">Ruhetag</p>
+                <p className="mt-1.5 text-[11px] text-neutral-500">Rest day</p>
               ) : (
                 <ul className="mt-1.5 flex flex-col gap-2">
                   {day.exercises.map((ex) => (
@@ -268,7 +268,7 @@ export function PlanOverview({ plan }: { plan: FullPlan }) {
                       markerWeek={markerWeek}
                     />
                   ))}
-                  {day.exercises.length === 0 && <li className="text-[11px] text-neutral-600">Keine Uebungen</li>}
+                  {day.exercises.length === 0 && <li className="text-[11px] text-neutral-600">No exercises</li>}
                 </ul>
               )}
             </div>

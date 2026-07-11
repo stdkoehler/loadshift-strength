@@ -28,7 +28,7 @@ export async function createPhaseAction(cycleId: number, input: unknown) {
 export async function updatePhaseAction(id: number, input: unknown) {
   const data = phaseUpdateSchema.parse(input);
   const existing = (await db.select().from(phases).where(eq(phases.id, id)))[0];
-  if (!existing) throw new Error('Phase nicht gefunden');
+  if (!existing) throw new Error('Phase not found');
   await db
     .update(phases)
     .set({

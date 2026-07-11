@@ -43,7 +43,7 @@ export function TemplatesModal({ onClose }: { onClose: () => void }) {
   };
 
   const remove = async (id: number) => {
-    if (!confirm('Vorlage loeschen?')) return;
+    if (!confirm('Delete template?')) return;
     setBusy(true);
     try {
       await deleteCycleAction(id);
@@ -58,10 +58,10 @@ export function TemplatesModal({ onClose }: { onClose: () => void }) {
   const inputClass = 'w-full rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-100';
 
   return (
-    <Modal title="Vorlagen" onClose={onClose}>
-      {!templates && <p className="text-sm text-neutral-500">Lade...</p>}
+    <Modal title="Templates" onClose={onClose}>
+      {!templates && <p className="text-sm text-neutral-500">Loading...</p>}
       {templates?.length === 0 && !creating && (
-        <p className="text-sm text-neutral-500">Noch keine Vorlagen. Erstelle eine neue oder speichere deinen aktiven Plan als Vorlage.</p>
+        <p className="text-sm text-neutral-500">No templates yet. Create a new one or save your active plan as a template.</p>
       )}
 
       <div className="flex flex-col gap-2">
@@ -69,7 +69,7 @@ export function TemplatesModal({ onClose }: { onClose: () => void }) {
           <div key={t.id} className="flex items-center gap-2 rounded-lg bg-neutral-800/60 px-3 py-2">
             <div className="min-w-0 flex-1">
               <div className="truncate text-sm text-neutral-100">{t.name}</div>
-              <div className="text-xs text-neutral-500">{t.lengthWeeks} Wochen</div>
+              <div className="text-xs text-neutral-500">{t.lengthWeeks} weeks</div>
             </div>
             <button
               type="button"
@@ -77,12 +77,12 @@ export function TemplatesModal({ onClose }: { onClose: () => void }) {
               onClick={() => setOpenModal({ type: 'loadTemplate', templateId: t.id })}
               className="rounded-md bg-emerald-500 px-2 py-1 text-xs font-medium text-neutral-950 disabled:opacity-50"
             >
-              Laden
+              Load
             </button>
-            <button type="button" disabled={busy} onClick={() => edit(t.id)} className="rounded-md px-2 py-1 text-neutral-400 hover:text-neutral-200" aria-label="Vorlage bearbeiten">
+            <button type="button" disabled={busy} onClick={() => edit(t.id)} className="rounded-md px-2 py-1 text-neutral-400 hover:text-neutral-200" aria-label="Edit template">
               <IconEdit width={16} height={16} />
             </button>
-            <button type="button" disabled={busy} onClick={() => remove(t.id)} className="rounded-md px-2 py-1 text-neutral-500 hover:text-red-400" aria-label="Vorlage loeschen">
+            <button type="button" disabled={busy} onClick={() => remove(t.id)} className="rounded-md px-2 py-1 text-neutral-500 hover:text-red-400" aria-label="Delete template">
               <IconTrash width={16} height={16} />
             </button>
           </div>
@@ -91,11 +91,11 @@ export function TemplatesModal({ onClose }: { onClose: () => void }) {
 
       {creating ? (
         <div className="flex flex-col gap-2 rounded-lg border border-neutral-700 p-3">
-          <label className="text-xs font-medium text-neutral-400">Name der neuen Vorlage</label>
+          <label className="text-xs font-medium text-neutral-400">Name of the new template</label>
           <input className={inputClass} value={newName} onChange={(e) => setNewName(e.target.value)} autoFocus />
           <div className="flex items-center gap-2">
             <button type="button" onClick={() => setCreating(false)} className="rounded-md px-3 py-1.5 text-sm text-neutral-400">
-              Abbrechen
+              Cancel
             </button>
             <button
               type="button"
@@ -103,7 +103,7 @@ export function TemplatesModal({ onClose }: { onClose: () => void }) {
               onClick={create}
               className="rounded-md bg-emerald-500 px-3 py-1.5 text-sm font-medium text-neutral-950 disabled:opacity-50"
             >
-              Erstellen
+              Create
             </button>
           </div>
         </div>
@@ -113,7 +113,7 @@ export function TemplatesModal({ onClose }: { onClose: () => void }) {
           onClick={() => setCreating(true)}
           className="flex items-center justify-center gap-1 rounded-md border border-dashed border-neutral-700 py-2 text-sm text-neutral-400"
         >
-          <IconPlus width={16} height={16} /> Neue Vorlage
+          <IconPlus width={16} height={16} /> New Template
         </button>
       )}
     </Modal>
@@ -146,12 +146,12 @@ export function LoadTemplatePrompt({ onClose }: { onClose: () => void }) {
 
   return (
     <Modal
-      title="Vorlage laden"
+      title="Load Template"
       onClose={() => setOpenModal(null)}
       footer={
         <>
           <button type="button" onClick={() => setOpenModal(null)} className="ml-auto rounded-md px-3 py-1.5 text-sm text-neutral-400">
-            Abbrechen
+            Cancel
           </button>
           <button
             type="button"
@@ -159,17 +159,17 @@ export function LoadTemplatePrompt({ onClose }: { onClose: () => void }) {
             onClick={confirmLoad}
             className="rounded-md bg-emerald-500 px-3 py-1.5 text-sm font-medium text-neutral-950 disabled:opacity-50"
           >
-            Laden
+            Load
           </button>
         </>
       }
     >
       <div>
-        <label className="mb-1 block text-xs font-medium text-neutral-400">Startdatum (Montag Woche 1)</label>
+        <label className="mb-1 block text-xs font-medium text-neutral-400">Start date (Monday of week 1)</label>
         <DatePicker value={startDate} onChange={setStartDate} />
       </div>
       <p className="text-xs text-neutral-500">
-        Erstellt eine neue Kopie dieser Vorlage als aktiven Plan ab dem gewaehlten Datum. Der aktuelle aktive Plan bleibt erhalten (inkl. seiner Historie), wird aber nicht mehr angezeigt.
+        Creates a new copy of this template as the active plan starting on the chosen date. The current active plan is kept (including its history), but is no longer shown.
       </p>
     </Modal>
   );

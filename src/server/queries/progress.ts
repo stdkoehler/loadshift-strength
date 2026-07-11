@@ -24,14 +24,14 @@ export async function getProgressForExercise(cycleId: number, exerciseId: number
 
   const weeks: ProgressWeek[] = [];
   for (let w = 1; w <= cycle.lengthWeeks; w++) {
-    let sollTop: number | null = null;
-    let volumeSoll = 0;
+    let targetTop: number | null = null;
+    let volumeTarget = 0;
     for (const s of workingSets) {
       const { weight, reps } = computeTarget(ex.progressionType as ProgressionType, s.targets, phaseRows, w, cycle.waveLengthWeeks);
-      if (weight != null && (sollTop == null || weight > sollTop)) sollTop = weight;
-      volumeSoll += (weight || 0) * (reps || 0);
+      if (weight != null && (targetTop == null || weight > targetTop)) targetTop = weight;
+      volumeTarget += (weight || 0) * (reps || 0);
     }
-    weeks.push({ week: w, sollTop, istTop: null, volumeSoll: Math.round(volumeSoll), volumeIst: 0 });
+    weeks.push({ week: w, targetTop, actualTop: null, volumeTarget: Math.round(volumeTarget), volumeActual: 0 });
   }
 
   const logRows = (
@@ -50,8 +50,8 @@ export async function getProgressForExercise(cycleId: number, exerciseId: number
       if (l.actualWeight != null && (topW == null || l.actualWeight > topW)) topW = l.actualWeight;
       volI += (l.actualWeight || 0) * (l.actualReps || 0);
     }
-    weeks[w - 1].istTop = topW;
-    weeks[w - 1].volumeIst = Math.round(volI);
+    weeks[w - 1].actualTop = topW;
+    weeks[w - 1].volumeActual = Math.round(volI);
   }
 
   return {

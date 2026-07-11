@@ -9,7 +9,7 @@ function num(v: number | string | null | undefined): number | null {
 }
 
 export function buildPayload(st: EditorState, phases: Phase[]): ExerciseInput {
-  const isPhasen = st.progressionType === 'phasen';
+  const isPhased = st.progressionType === 'phased';
   const common = {
     name: st.name.trim(),
     progressionType: st.progressionType,
@@ -21,7 +21,7 @@ export function buildPayload(st: EditorState, phases: Phase[]): ExerciseInput {
 
   const repeatIncrement = num(st.repeatIncrement) ?? 0;
 
-  if (isPhasen && st.structure === 'uniform') {
+  if (isPhased && st.structure === 'uniform') {
     const n = Math.max(1, Number(st.uniform.numSets) || 1);
     sets = Array.from({ length: n }, () => ({
       role: null,
@@ -34,7 +34,7 @@ export function buildPayload(st: EditorState, phases: Phase[]): ExerciseInput {
         incrementPerRepeat: repeatIncrement,
       })),
     }));
-  } else if (isPhasen && st.structure === 'custom') {
+  } else if (isPhased && st.structure === 'custom') {
     sets = st.customPhase.map((c) => ({
       role: c.role || null,
       targets: phases.map((p) => ({

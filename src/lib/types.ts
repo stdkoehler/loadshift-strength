@@ -27,11 +27,11 @@ export interface FullPlan {
 export interface SessionSet {
   setIndex: number;
   role: string | null;
-  sollReps: number | null;
-  sollWeight: number | null;
-  sollRir: number | null;
-  istReps: number | null;
-  istWeight: number | null;
+  targetReps: number | null;
+  targetWeight: number | null;
+  targetRir: number | null;
+  actualReps: number | null;
+  actualWeight: number | null;
   done: boolean;
   volume: number;
 }
@@ -60,10 +60,10 @@ export interface SessionForDate {
 
 export interface ProgressWeek {
   week: number;
-  sollTop: number | null;
-  istTop: number | null;
-  volumeSoll: number;
-  volumeIst: number;
+  targetTop: number | null;
+  actualTop: number | null;
+  volumeTarget: number;
+  volumeActual: number;
 }
 
 export interface ProgressResult {
@@ -78,11 +78,11 @@ export interface HistorySetEntry {
   exerciseId: number;
   exerciseName: string;
   setIndex: number;
-  sollReps: number | null;
-  sollWeight: number | null;
-  sollRir: number | null;
-  istReps: number | null;
-  istWeight: number | null;
+  targetReps: number | null;
+  targetWeight: number | null;
+  targetRir: number | null;
+  actualReps: number | null;
+  actualWeight: number | null;
   done: boolean;
 }
 
@@ -96,10 +96,10 @@ export interface HistoryDay {
 export interface ExerciseHistoryPoint {
   date: string;
   cycleName: string;
-  sollTop: number | null;
-  istTop: number | null;
-  volumeSoll: number;
-  volumeIst: number;
+  targetTop: number | null;
+  actualTop: number | null;
+  volumeTarget: number;
+  volumeActual: number;
 }
 
 export interface ExerciseHistoryResult {

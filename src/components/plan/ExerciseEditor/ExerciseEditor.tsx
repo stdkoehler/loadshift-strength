@@ -15,9 +15,9 @@ import { RampPhased } from './RampPhased';
 import type { ExerciseInput } from '@/zod/exercise.schema';
 
 const PROGRESSION_LABELS: Record<ProgressionType, string> = {
-  konstant: 'Konstant',
+  constant: 'Constant',
   linear: 'Linear',
-  phasen: 'Phasen-Welle',
+  phased: 'Phased Wave',
 };
 
 export function ExerciseEditor({
@@ -35,7 +35,7 @@ export function ExerciseEditor({
 }) {
   const [st, setSt] = useState<EditorState>(() => deriveState(initial, phases));
   const [saving, setSaving] = useState(false);
-  const isPhasen = st.progressionType === 'phasen';
+  const isPhased = st.progressionType === 'phased';
   const patch = (p: Partial<EditorState>) => setSt((s) => ({ ...s, ...p }));
 
   const canSave = st.name.trim().length > 0;
@@ -52,11 +52,11 @@ export function ExerciseEditor({
     <>
       {onDelete && (
         <button type="button" onClick={onDelete} className="rounded-md bg-red-500/15 px-3 py-1.5 text-sm text-red-400">
-          Loeschen
+          Delete
         </button>
       )}
       <button type="button" onClick={onClose} className="ml-auto rounded-md px-3 py-1.5 text-sm text-neutral-400">
-        Abbrechen
+        Cancel
       </button>
       <button
         type="button"
@@ -64,13 +64,13 @@ export function ExerciseEditor({
         onClick={save}
         className="rounded-md bg-emerald-500 px-3 py-1.5 text-sm font-medium text-neutral-950 disabled:opacity-50"
       >
-        Speichern
+        Save
       </button>
     </>
   );
 
   return (
-    <Modal title={initial ? 'Uebung bearbeiten' : 'Neue Uebung'} onClose={onClose} footer={footer}>
+    <Modal title={initial ? 'Edit Exercise' : 'New Exercise'} onClose={onClose} footer={footer}>
       <div>
         <label className={labelClass}>Name</label>
         <input
@@ -78,14 +78,14 @@ export function ExerciseEditor({
           className={inputClass}
           value={st.name}
           onChange={(e) => patch({ name: e.target.value })}
-          placeholder="z.B. LH Bankdruecken"
+          placeholder="e.g. Barbell Bench Press"
         />
       </div>
 
       <div>
         <label className={labelClass}>Progression</label>
         <div className="flex gap-1">
-          {(['konstant', 'linear', 'phasen'] as ProgressionType[]).map((t) => (
+          {(['constant', 'linear', 'phased'] as ProgressionType[]).map((t) => (
             <button key={t} type="button" className={segButtonClass(st.progressionType === t)} onClick={() => patch({ progressionType: t })}>
               {PROGRESSION_LABELS[t]}
             </button>
@@ -95,14 +95,14 @@ export function ExerciseEditor({
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className={labelClass}>Pause (min)</label>
+          <label className={labelClass}>Rest (min)</label>
           <input inputMode="decimal" className={inputClass} value={st.pauseMin} onChange={(e) => patch({ pauseMin: e.target.value })} />
         </div>
         <div>
-          <label className={labelClass}>Satz-Struktur</label>
+          <label className={labelClass}>Set Structure</label>
           <div className="flex gap-1">
             <button type="button" className={segButtonClass(st.structure === 'uniform')} onClick={() => patch({ structure: 'uniform' })}>
-              Gleich
+              Uniform
             </button>
             <button type="button" className={segButtonClass(st.structure === 'custom')} onClick={() => patch({ structure: 'custom' })}>
               Ramp
@@ -112,38 +112,37 @@ export function ExerciseEditor({
       </div>
 
       <div>
-        <label className={labelClass}>Notizen</label>
+        <label className={labelClass}>Notes</label>
         <textarea
           rows={3}
           className={`${inputClass} app-scroll resize-none`}
           value={st.notes}
           onChange={(e) => patch({ notes: e.target.value })}
-          placeholder="z.B. Hinweise zur Ausfuehrung, Begruendung fuer Gewichtsanpassungen, ..."
+          placeholder="e.g. form cues, reasoning for weight adjustments, ..."
         />
       </div>
 
-      {isPhasen && (
+      {isPhased && (
         <div>
-          <label className={labelClass}>Steigerung je Wellen-Wiederholung (kg)</label>
+          <label className={labelClass}>Increment per Wave Repeat (kg)</label>
           <input
             inputMode="decimal"
-            placeholder="0 = keine automatische Steigerung"
+            placeholder="0 = no automatic increment"
             className={inputClass}
             value={st.repeatIncrement}
             onChange={(e) => patch({ repeatIncrement: e.target.value })}
           />
           <p className="mt-1 text-xs text-neutral-500">
-            Nur relevant, wenn der Zyklus eine Wellenlaenge hat (Zyklus-Einstellungen). Wird einmal pro
-            komplettem Wellendurchlauf zu allen Phasen-Gewichten addiert, damit die Welle nicht endlos identisch
-            wiederholt.
+            Only relevant if the cycle has a wave length (cycle settings). Added once per full
+            wave repeat to all phase weights, so the wave doesn&apos;t replay identically forever.
           </p>
         </div>
       )}
 
-      {isPhasen && st.structure === 'uniform' && <UniformPhased st={st} patch={patch} phases={phases} />}
-      {isPhasen && st.structure === 'custom' && <RampPhased st={st} patch={patch} phases={phases} />}
-      {!isPhasen && st.structure === 'uniform' && <UniformNonPhased st={st} patch={patch} />}
-      {!isPhasen && st.structure === 'custom' && <RampNonPhased st={st} patch={patch} />}
+      {isPhased && st.structure === 'uniform' && <UniformPhased st={st} patch={patch} phases={phases} />}
+      {isPhased && st.structure === 'custom' && <RampPhased st={st} patch={patch} phases={phases} />}
+      {!isPhased && st.structure === 'uniform' && <UniformNonPhased st={st} patch={patch} />}
+      {!isPhased && st.structure === 'custom' && <RampNonPhased st={st} patch={patch} />}
     </Modal>
   );
 }

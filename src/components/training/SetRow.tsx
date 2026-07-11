@@ -10,9 +10,9 @@ import type { SessionSet } from '@/lib/types';
 
 const ROLE_CLASS: Record<string, string> = {
   'Warm-up': 'bg-sky-500/15 text-sky-300',
-  'Top-Satz': 'bg-amber-500/15 text-amber-300',
+  'Top-Set': 'bg-amber-500/15 text-amber-300',
   'Back-off': 'bg-violet-500/15 text-violet-300',
-  'Kraftausdauer-Touch': 'bg-emerald-500/15 text-emerald-300',
+  'Endurance-Touch': 'bg-emerald-500/15 text-emerald-300',
 };
 
 function RoleChip({ role }: { role: string | null }) {
@@ -27,16 +27,16 @@ function RoleChip({ role }: { role: string | null }) {
 export function SetRow({ exerciseId, date, set }: { exerciseId: number; date: string; set: SessionSet }) {
   const queryClient = useQueryClient();
   const editable = date === todayIso();
-  const [reps, setReps] = useState(set.istReps != null ? String(set.istReps) : '');
-  const [weight, setWeight] = useState(set.istWeight != null ? String(set.istWeight) : '');
+  const [reps, setReps] = useState(set.actualReps != null ? String(set.actualReps) : '');
+  const [weight, setWeight] = useState(set.actualWeight != null ? String(set.actualWeight) : '');
   const [done, setDone] = useState(set.done);
 
   useEffect(() => {
-    setReps(set.istReps != null ? String(set.istReps) : '');
-    setWeight(set.istWeight != null ? String(set.istWeight) : '');
+    setReps(set.actualReps != null ? String(set.actualReps) : '');
+    setWeight(set.actualWeight != null ? String(set.actualWeight) : '');
     setDone(set.done);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [set.istReps, set.istWeight, set.done, date, exerciseId]);
+  }, [set.actualReps, set.actualWeight, set.done, date, exerciseId]);
 
   const save = async (nextReps: string, nextWeight: string, nextDone: boolean) => {
     await upsertLogAction({
@@ -51,7 +51,7 @@ export function SetRow({ exerciseId, date, set }: { exerciseId: number; date: st
   };
 
   const handleToggle = () => {
-    const result = toggleDone({ reps, weight, done }, { sollReps: set.sollReps, sollWeight: set.sollWeight });
+    const result = toggleDone({ reps, weight, done }, { targetReps: set.targetReps, targetWeight: set.targetWeight });
     setReps(result.reps);
     setWeight(result.weight);
     setDone(result.done);
@@ -63,18 +63,18 @@ export function SetRow({ exerciseId, date, set }: { exerciseId: number; date: st
       <div className="w-5 text-center text-sm text-neutral-500">{set.setIndex}</div>
       <div className="flex flex-1 flex-col gap-1">
         <div className="text-sm text-neutral-300">
-          <b className="text-neutral-100">{set.sollReps ?? '–'}</b>
+          <b className="text-neutral-100">{set.targetReps ?? '–'}</b>
           <span className="mx-1 text-neutral-600">×</span>
-          <b className="text-neutral-100">{set.sollWeight != null ? fmt(set.sollWeight) : '–'}</b>
+          <b className="text-neutral-100">{set.targetWeight != null ? fmt(set.targetWeight) : '–'}</b>
           <span className="text-neutral-500"> kg</span>
-          {set.sollRir != null && <span className="ml-2 text-xs text-neutral-500">RIR {fmt(set.sollRir)}</span>}
+          {set.targetRir != null && <span className="ml-2 text-xs text-neutral-500">RIR {fmt(set.targetRir)}</span>}
         </div>
         <RoleChip role={set.role} />
       </div>
       <div className="flex items-center gap-2">
         <input
           inputMode="numeric"
-          placeholder={set.sollReps != null ? String(set.sollReps) : 'Wdh'}
+          placeholder={set.targetReps != null ? String(set.targetReps) : 'Reps'}
           value={reps}
           disabled={!editable}
           onChange={(e) => setReps(e.target.value)}
@@ -84,7 +84,7 @@ export function SetRow({ exerciseId, date, set }: { exerciseId: number; date: st
         <span className="text-neutral-600">×</span>
         <input
           inputMode="decimal"
-          placeholder={set.sollWeight != null ? fmt(set.sollWeight) : 'kg'}
+          placeholder={set.targetWeight != null ? fmt(set.targetWeight) : 'kg'}
           value={weight}
           disabled={!editable}
           onChange={(e) => setWeight(e.target.value)}
@@ -93,7 +93,7 @@ export function SetRow({ exerciseId, date, set }: { exerciseId: number; date: st
         />
         <button
           type="button"
-          aria-label="erledigt"
+          aria-label="done"
           onClick={handleToggle}
           disabled={!editable}
           className={`flex h-8 w-8 items-center justify-center rounded-full border transition-colors disabled:opacity-60 ${

@@ -26,10 +26,10 @@ export async function createTemplateAction(input: unknown) {
 export async function loadTemplateAction(input: unknown) {
   const data = loadTemplateSchema.parse(input);
   const template = await getCycle(data.templateId);
-  if (!template || !template.isTemplate) throw new Error('Vorlage nicht gefunden');
+  if (!template || !template.isTemplate) throw new Error('Template not found');
 
   const payload = await exportCycle(data.templateId, false);
-  if (!payload) throw new Error('Vorlage nicht gefunden');
+  if (!payload) throw new Error('Template not found');
   payload.cycle.startDate = data.startDate;
 
   return importCycleAction(payload, { activate: true, isTemplate: false });
@@ -38,15 +38,15 @@ export async function loadTemplateAction(input: unknown) {
 export async function saveActivePlanAsTemplateAction(input: unknown) {
   const data = saveAsTemplateSchema.parse(input);
   const source = await getCycle(data.cycleId);
-  if (!source) throw new Error('Plan nicht gefunden');
+  if (!source) throw new Error('Plan not found');
 
   const payload = await exportCycle(data.cycleId, false);
-  if (!payload) throw new Error('Plan nicht gefunden');
+  if (!payload) throw new Error('Plan not found');
   payload.cycle.name = data.name;
 
   if (data.overwriteTemplateId) {
     const existing = await getCycle(data.overwriteTemplateId);
-    if (!existing || !existing.isTemplate) throw new Error('Zu ueberschreibende Vorlage nicht gefunden');
+    if (!existing || !existing.isTemplate) throw new Error('Template to overwrite not found');
     await deleteCycleAction(data.overwriteTemplateId);
   }
 

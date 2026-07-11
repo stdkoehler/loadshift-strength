@@ -12,8 +12,8 @@ describe('addDays', () => {
 
 describe('dowName / dowShort', () => {
   it('names 2024-01-01 (a Monday) correctly', () => {
-    expect(dowName('2024-01-01')).toBe('Montag');
-    expect(dowShort('2024-01-01')).toBe('Mo');
+    expect(dowName('2024-01-01')).toBe('Monday');
+    expect(dowShort('2024-01-01')).toBe('Mon');
   });
 });
 

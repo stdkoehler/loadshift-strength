@@ -6,7 +6,7 @@ export function UniformNonPhased({ st, patch }: { st: EditorState; patch: (p: Pa
     <div className="flex flex-col gap-3">
       <div className="grid grid-cols-4 gap-2">
         <div>
-          <label className={labelClass}>Saetze</label>
+          <label className={labelClass}>Sets</label>
           <input
             inputMode="numeric"
             className={inputClass}
@@ -15,7 +15,7 @@ export function UniformNonPhased({ st, patch }: { st: EditorState; patch: (p: Pa
           />
         </div>
         <div>
-          <label className={labelClass}>Wdh</label>
+          <label className={labelClass}>Reps</label>
           <input
             inputMode="numeric"
             className={inputClass}
@@ -24,7 +24,7 @@ export function UniformNonPhased({ st, patch }: { st: EditorState; patch: (p: Pa
           />
         </div>
         <div>
-          <label className={labelClass}>Gewicht (kg)</label>
+          <label className={labelClass}>Weight (kg)</label>
           <input
             inputMode="decimal"
             className={inputClass}
@@ -45,7 +45,7 @@ export function UniformNonPhased({ st, patch }: { st: EditorState; patch: (p: Pa
       </div>
       {st.progressionType === 'linear' && (
         <div>
-          <label className={labelClass}>Steigerung / Woche (kg)</label>
+          <label className={labelClass}>Increment / week (kg)</label>
           <input
             inputMode="decimal"
             className={inputClass}

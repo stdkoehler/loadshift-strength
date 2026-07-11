@@ -13,11 +13,11 @@ export async function getHistoryDays(fromDate: string, toDate: string): Promise<
       exerciseName: exercises.name,
       exerciseOrder: exercises.orderIndex,
       setIndex: logs.setIndex,
-      sollReps: logs.sollReps,
-      sollWeight: logs.sollWeight,
-      sollRir: logs.sollRir,
-      istReps: logs.actualReps,
-      istWeight: logs.actualWeight,
+      targetReps: logs.targetReps,
+      targetWeight: logs.targetWeight,
+      targetRir: logs.targetRir,
+      actualReps: logs.actualReps,
+      actualWeight: logs.actualWeight,
       done: logs.done,
     })
     .from(logs)
@@ -37,11 +37,11 @@ export async function getHistoryDays(fromDate: string, toDate: string): Promise<
       exerciseId: r.exerciseId,
       exerciseName: r.exerciseName,
       setIndex: r.setIndex,
-      sollReps: r.sollReps,
-      sollWeight: r.sollWeight,
-      sollRir: r.sollRir,
-      istReps: r.istReps,
-      istWeight: r.istWeight,
+      targetReps: r.targetReps,
+      targetWeight: r.targetWeight,
+      targetRir: r.targetRir,
+      actualReps: r.actualReps,
+      actualWeight: r.actualWeight,
       done: r.done,
     });
   }
@@ -63,10 +63,10 @@ export async function getExerciseHistoryByName(name: string, fromDate: string, t
     .select({
       date: logs.logDate,
       cycleName: cycles.name,
-      sollReps: logs.sollReps,
-      sollWeight: logs.sollWeight,
-      istReps: logs.actualReps,
-      istWeight: logs.actualWeight,
+      targetReps: logs.targetReps,
+      targetWeight: logs.targetWeight,
+      actualReps: logs.actualReps,
+      actualWeight: logs.actualWeight,
     })
     .from(logs)
     .innerJoin(exercises, eq(exercises.id, logs.exerciseId))
@@ -86,18 +86,18 @@ export async function getExerciseHistoryByName(name: string, fromDate: string, t
 
   const byDate = new Map<
     string,
-    { cycleName: string; sollTop: number | null; istTop: number | null; volumeSoll: number; volumeIst: number }
+    { cycleName: string; targetTop: number | null; actualTop: number | null; volumeTarget: number; volumeActual: number }
   >();
   for (const r of rows) {
     let d = byDate.get(r.date);
     if (!d) {
-      d = { cycleName: r.cycleName, sollTop: null, istTop: null, volumeSoll: 0, volumeIst: 0 };
+      d = { cycleName: r.cycleName, targetTop: null, actualTop: null, volumeTarget: 0, volumeActual: 0 };
       byDate.set(r.date, d);
     }
-    if (r.sollWeight != null && (d.sollTop == null || r.sollWeight > d.sollTop)) d.sollTop = r.sollWeight;
-    if (r.istWeight != null && (d.istTop == null || r.istWeight > d.istTop)) d.istTop = r.istWeight;
-    d.volumeSoll += (r.sollWeight || 0) * (r.sollReps || 0);
-    d.volumeIst += (r.istWeight || 0) * (r.istReps || 0);
+    if (r.targetWeight != null && (d.targetTop == null || r.targetWeight > d.targetTop)) d.targetTop = r.targetWeight;
+    if (r.actualWeight != null && (d.actualTop == null || r.actualWeight > d.actualTop)) d.actualTop = r.actualWeight;
+    d.volumeTarget += (r.targetWeight || 0) * (r.targetReps || 0);
+    d.volumeActual += (r.actualWeight || 0) * (r.actualReps || 0);
   }
 
   const points: ExerciseHistoryPoint[] = Array.from(byDate.entries())
@@ -105,10 +105,10 @@ export async function getExerciseHistoryByName(name: string, fromDate: string, t
     .map(([date, d]) => ({
       date,
       cycleName: d.cycleName,
-      sollTop: d.sollTop,
-      istTop: d.istTop,
-      volumeSoll: Math.round(d.volumeSoll),
-      volumeIst: Math.round(d.volumeIst),
+      targetTop: d.targetTop,
+      actualTop: d.actualTop,
+      volumeTarget: Math.round(d.volumeTarget),
+      volumeActual: Math.round(d.volumeActual),
     }));
 
   return { exerciseName: name, points };

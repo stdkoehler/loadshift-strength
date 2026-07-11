@@ -21,8 +21,8 @@ export function ExerciseCard({ exercise, date }: { exercise: SessionExercise; da
       <div className="mb-3 flex items-baseline justify-between">
         <h3 className="text-base font-semibold text-neutral-100">{exercise.name}</h3>
         <div className="flex items-center gap-2">
-          {exercise.pauseMin != null && <span className="text-xs text-neutral-500">Pause {exercise.pauseMin} min</span>}
-          <button type="button" aria-label="Pause starten" onClick={startRest} className="text-neutral-500 hover:text-emerald-400">
+          {exercise.pauseMin != null && <span className="text-xs text-neutral-500">Rest {exercise.pauseMin} min</span>}
+          <button type="button" aria-label="Start rest timer" onClick={startRest} className="text-neutral-500 hover:text-emerald-400">
             <IconTimer width={17} height={17} />
           </button>
         </div>
