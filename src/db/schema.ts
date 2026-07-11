@@ -82,6 +82,7 @@ export const logs = sqliteTable('logs', {
   weekNumber: integer('week_number').notNull(),
   actualReps: integer('actual_reps'),
   actualWeight: real('actual_weight'),
+  actualRir: real('actual_rir'),
   done: integer('done', { mode: 'boolean' }).notNull().default(false),
   // Snapshot of the planned (target) values at the moment this row was written, so a
   // day's history stays accurate even if the exercise's targets are edited later.

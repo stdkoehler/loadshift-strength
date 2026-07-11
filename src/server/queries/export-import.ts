@@ -62,6 +62,7 @@ export async function exportCycle(cycleId: number, includeLogs: boolean): Promis
         logDate: logs.logDate,
         actualReps: logs.actualReps,
         actualWeight: logs.actualWeight,
+        actualRir: logs.actualRir,
         done: logs.done,
         dayId: exercises.dayId,
       })
@@ -80,6 +81,7 @@ export async function exportCycle(cycleId: number, includeLogs: boolean): Promis
         date: l.logDate,
         actualReps: l.actualReps,
         actualWeight: l.actualWeight,
+        actualRir: l.actualRir,
         done: l.done,
       }))
       .filter((l) => l.exerciseIndex !== -1);

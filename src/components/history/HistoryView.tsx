@@ -62,6 +62,7 @@ function ExerciseLogGroup({ group }: { group: ExerciseGroup }) {
               </span>
               <span className="shrink-0 text-xs text-neutral-100">
                 Actual {s.actualReps ?? '–'}×{s.actualWeight != null ? fmt(s.actualWeight) : '–'}kg
+                {s.actualRir != null && <> · RIR {fmt(s.actualRir)}</>}
               </span>
             </div>
           ))}
@@ -80,6 +81,7 @@ export function HistoryView() {
   const { data: exerciseNames } = useHistoryExerciseNames();
   const activeExercise = exerciseName ?? exerciseNames?.[0];
   const { data: trend } = useHistoryExercise(activeExercise, from, to);
+  const hasRir = trend?.points?.some((p) => p.targetRir != null || p.actualRir != null);
 
   return (
     <div className="flex flex-col gap-4 px-4 py-3">
@@ -124,6 +126,28 @@ export function HistoryView() {
             </>
           ) : (
             <p className="text-xs text-neutral-500">No data in this date range.</p>
+          )}
+
+          {hasRir && (
+            <>
+              <h4 className="mt-4 text-sm font-semibold text-neutral-100">RIR (Reps in Reserve)</h4>
+              <LineChart
+                data={trend!.points}
+                xKey="date"
+                series={[
+                  { key: 'targetRir', color: TARGET_COLOR, dashed: true },
+                  { key: 'actualRir', color: ACTUAL_COLOR },
+                ]}
+              />
+              <div className="mt-2 flex gap-4 text-xs text-neutral-400">
+                <span className="flex items-center gap-1">
+                  <span className="h-2 w-2 rounded-full" style={{ background: TARGET_COLOR }} />Target
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="h-2 w-2 rounded-full" style={{ background: ACTUAL_COLOR }} />Actual
+                </span>
+              </div>
+            </>
           )}
         </div>
       )}

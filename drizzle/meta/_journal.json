@@ -36,6 +36,13 @@
       "when": 1783543051231,
       "tag": "0004_rename_target_and_progression_type",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1783762234512,
+      "tag": "0005_acoustic_zaladane",
+      "breakpoints": true
     }
   ]
 }

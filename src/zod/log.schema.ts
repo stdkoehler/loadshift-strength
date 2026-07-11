@@ -6,6 +6,7 @@ export const logInputSchema = z.object({
   logDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Erwartet YYYY-MM-DD'),
   actualReps: z.number().int().nullable().optional(),
   actualWeight: z.number().nullable().optional(),
+  actualRir: z.number().nullable().optional(),
   done: z.boolean().optional().default(false),
 });
 

@@ -19,7 +19,7 @@ export async function upsertLogAction(input: unknown) {
   if (!cycle || !cycle.startDate) throw new Error('No active cycle');
 
   const weekNumber = weekNumberFor(cycle.startDate, data.logDate);
-  const isEmpty = (data.actualReps == null) && (data.actualWeight == null) && !data.done;
+  const isEmpty = (data.actualReps == null) && (data.actualWeight == null) && (data.actualRir == null) && !data.done;
 
   if (isEmpty) {
     await db
@@ -49,6 +49,7 @@ export async function upsertLogAction(input: unknown) {
       weekNumber,
       actualReps: data.actualReps ?? null,
       actualWeight: data.actualWeight ?? null,
+      actualRir: data.actualRir ?? null,
       done: data.done,
       targetReps: target.reps,
       targetWeight: target.weight,
@@ -59,6 +60,7 @@ export async function upsertLogAction(input: unknown) {
       set: {
         actualReps: data.actualReps ?? null,
         actualWeight: data.actualWeight ?? null,
+        actualRir: data.actualRir ?? null,
         done: data.done,
         weekNumber,
         targetReps: target.reps,

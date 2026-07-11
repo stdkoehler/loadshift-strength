@@ -119,6 +119,7 @@ export async function importCycleAction(
             weekNumber: week,
             actualReps: l.actualReps ?? null,
             actualWeight: l.actualWeight ?? null,
+            actualRir: l.actualRir ?? null,
             done: l.done,
           })
           .run();

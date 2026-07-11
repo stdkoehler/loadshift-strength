@@ -32,6 +32,7 @@ export interface SessionSet {
   targetRir: number | null;
   actualReps: number | null;
   actualWeight: number | null;
+  actualRir: number | null;
   done: boolean;
   volume: number;
 }
@@ -64,6 +65,8 @@ export interface ProgressWeek {
   actualTop: number | null;
   volumeTarget: number;
   volumeActual: number;
+  targetRir: number | null;
+  actualRir: number | null;
 }
 
 export interface ProgressResult {
@@ -83,6 +86,7 @@ export interface HistorySetEntry {
   targetRir: number | null;
   actualReps: number | null;
   actualWeight: number | null;
+  actualRir: number | null;
   done: boolean;
 }
 
@@ -100,6 +104,8 @@ export interface ExerciseHistoryPoint {
   actualTop: number | null;
   volumeTarget: number;
   volumeActual: number;
+  targetRir: number | null;
+  actualRir: number | null;
 }
 
 export interface ExerciseHistoryResult {
@@ -151,6 +157,7 @@ export interface ExportLog {
   date: string;
   actualReps: number | null;
   actualWeight: number | null;
+  actualRir: number | null;
   done: boolean;
 }
 export interface ExportPayload {

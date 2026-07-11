@@ -51,6 +51,7 @@ export async function getSessionForDate(cycleId: number, dateIso: string): Promi
       const log = logMap.get(`${ex.id}:${s.setIndex}`) ?? null;
       const actualWeight = log?.actualWeight ?? null;
       const actualReps = log?.actualReps ?? null;
+      const actualRir = log?.actualRir ?? null;
       // Once a set has been logged, its planned values are frozen in the log row
       // (target* columns) so history stays accurate even if the exercise's targets are
       // edited later. Unlogged sets keep showing the live, currently-computed target.
@@ -69,6 +70,7 @@ export async function getSessionForDate(cycleId: number, dateIso: string): Promi
         targetRir: usedTargetRir,
         actualReps: actualReps,
         actualWeight: actualWeight,
+        actualRir: actualRir,
         done: log ? log.done : false,
         volume: Math.round(volume),
       };

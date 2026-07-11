@@ -44,6 +44,7 @@ const exportLogSchema = z.object({
   date: z.string(),
   actualReps: z.number().nullable(),
   actualWeight: z.number().nullable(),
+  actualRir: z.number().nullable().optional(),
   done: z.boolean(),
 });
 

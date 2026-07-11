@@ -29,22 +29,25 @@ export function SetRow({ exerciseId, date, set }: { exerciseId: number; date: st
   const editable = date === todayIso();
   const [reps, setReps] = useState(set.actualReps != null ? String(set.actualReps) : '');
   const [weight, setWeight] = useState(set.actualWeight != null ? String(set.actualWeight) : '');
+  const [rir, setRir] = useState(set.actualRir != null ? String(set.actualRir) : '');
   const [done, setDone] = useState(set.done);
 
   useEffect(() => {
     setReps(set.actualReps != null ? String(set.actualReps) : '');
     setWeight(set.actualWeight != null ? String(set.actualWeight) : '');
+    setRir(set.actualRir != null ? String(set.actualRir) : '');
     setDone(set.done);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [set.actualReps, set.actualWeight, set.done, date, exerciseId]);
+  }, [set.actualReps, set.actualWeight, set.actualRir, set.done, date, exerciseId]);
 
-  const save = async (nextReps: string, nextWeight: string, nextDone: boolean) => {
+  const save = async (nextReps: string, nextWeight: string, nextRir: string, nextDone: boolean) => {
     await upsertLogAction({
       exerciseId,
       setIndex: set.setIndex,
       logDate: date,
       actualReps: nextReps === '' ? null : Number(nextReps),
       actualWeight: nextWeight === '' ? null : Number(nextWeight),
+      actualRir: nextRir === '' ? null : Number(nextRir),
       done: nextDone,
     });
     await queryClient.invalidateQueries({ queryKey: queryKeys.session(date) });
@@ -55,7 +58,7 @@ export function SetRow({ exerciseId, date, set }: { exerciseId: number; date: st
     setReps(result.reps);
     setWeight(result.weight);
     setDone(result.done);
-    void save(result.reps, result.weight, result.done);
+    void save(result.reps, result.weight, rir, result.done);
   };
 
   return (
@@ -78,7 +81,7 @@ export function SetRow({ exerciseId, date, set }: { exerciseId: number; date: st
           value={reps}
           disabled={!editable}
           onChange={(e) => setReps(e.target.value)}
-          onBlur={() => void save(reps, weight, done)}
+          onBlur={() => void save(reps, weight, rir, done)}
           className="w-14 rounded-md border border-neutral-700 bg-neutral-800 px-2 py-1 text-center text-sm text-neutral-100 disabled:opacity-60"
         />
         <span className="text-neutral-600">×</span>
@@ -88,8 +91,17 @@ export function SetRow({ exerciseId, date, set }: { exerciseId: number; date: st
           value={weight}
           disabled={!editable}
           onChange={(e) => setWeight(e.target.value)}
-          onBlur={() => void save(reps, weight, done)}
+          onBlur={() => void save(reps, weight, rir, done)}
           className="w-16 rounded-md border border-neutral-700 bg-neutral-800 px-2 py-1 text-center text-sm text-neutral-100 disabled:opacity-60"
+        />
+        <input
+          inputMode="decimal"
+          placeholder={set.targetRir != null ? `RIR ${fmt(set.targetRir)}` : 'RIR'}
+          value={rir}
+          disabled={!editable}
+          onChange={(e) => setRir(e.target.value)}
+          onBlur={() => void save(reps, weight, rir, done)}
+          className="w-14 rounded-md border border-neutral-700 bg-neutral-800 px-2 py-1 text-center text-sm text-neutral-100 disabled:opacity-60"
         />
         <button
           type="button"

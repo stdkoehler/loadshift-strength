@@ -24,6 +24,7 @@ export function ProgressView() {
   if (!list.exercises.length) return <p className="px-4 py-6 text-sm text-neutral-500">No exercises in the active cycle.</p>;
 
   const hasActual = data?.weeks?.some((w) => w.actualTop != null || w.volumeActual > 0);
+  const hasRir = data?.weeks?.some((w) => w.targetRir != null || w.actualRir != null);
 
   return (
     <div className="flex flex-col gap-4 px-4 py-3">
@@ -77,6 +78,25 @@ export function ProgressView() {
               <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full" style={{ background: ACTUAL_COLOR }} />Actual</span>
             </div>
           </div>
+
+          {hasRir && (
+            <div className="rounded-xl border border-neutral-800 bg-neutral-900/60 p-3">
+              <h4 className="text-sm font-semibold text-neutral-100">RIR (Reps in Reserve)</h4>
+              <p className="mb-2 text-xs text-neutral-500">Target vs. actually felt, average per week</p>
+              <LineChart
+                data={data.weeks}
+                xKey="week"
+                series={[
+                  { key: 'targetRir', color: TARGET_COLOR, dashed: true },
+                  { key: 'actualRir', color: ACTUAL_COLOR },
+                ]}
+              />
+              <div className="mt-2 flex gap-4 text-xs text-neutral-400">
+                <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full" style={{ background: TARGET_COLOR }} />Target</span>
+                <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full" style={{ background: ACTUAL_COLOR }} />Actual</span>
+              </div>
+            </div>
+          )}
 
           {!hasActual && (
             <p className="text-xs text-neutral-500">

@@ -1,7 +1,7 @@
 import { and, eq } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { exercises, logs, sets } from '@/db/schema';
-import { computeTarget } from '@/lib/progression';
+import { computeTarget, round } from '@/lib/progression';
 import type { ProgressionType } from '@/lib/progression';
 import type { ProgressResult, ProgressWeek } from '@/lib/types';
 import { getCycle, getPhases } from './cycles';
@@ -26,12 +26,26 @@ export async function getProgressForExercise(cycleId: number, exerciseId: number
   for (let w = 1; w <= cycle.lengthWeeks; w++) {
     let targetTop: number | null = null;
     let volumeTarget = 0;
+    let rirSum = 0;
+    let rirCount = 0;
     for (const s of workingSets) {
-      const { weight, reps } = computeTarget(ex.progressionType as ProgressionType, s.targets, phaseRows, w, cycle.waveLengthWeeks);
+      const { weight, reps, rir } = computeTarget(ex.progressionType as ProgressionType, s.targets, phaseRows, w, cycle.waveLengthWeeks);
       if (weight != null && (targetTop == null || weight > targetTop)) targetTop = weight;
       volumeTarget += (weight || 0) * (reps || 0);
+      if (rir != null) {
+        rirSum += rir;
+        rirCount += 1;
+      }
     }
-    weeks.push({ week: w, targetTop, actualTop: null, volumeTarget: Math.round(volumeTarget), volumeActual: 0 });
+    weeks.push({
+      week: w,
+      targetTop,
+      actualTop: null,
+      volumeTarget: Math.round(volumeTarget),
+      volumeActual: 0,
+      targetRir: rirCount > 0 ? round(rirSum / rirCount) : null,
+      actualRir: null,
+    });
   }
 
   const logRows = (
@@ -46,12 +60,19 @@ export async function getProgressForExercise(cycleId: number, exerciseId: number
     if (w < 1 || w > cycle.lengthWeeks) continue;
     let topW: number | null = null;
     let volI = 0;
+    let rirSum = 0;
+    let rirCount = 0;
     for (const l of arr) {
       if (l.actualWeight != null && (topW == null || l.actualWeight > topW)) topW = l.actualWeight;
       volI += (l.actualWeight || 0) * (l.actualReps || 0);
+      if (l.actualRir != null) {
+        rirSum += l.actualRir;
+        rirCount += 1;
+      }
     }
     weeks[w - 1].actualTop = topW;
     weeks[w - 1].volumeActual = Math.round(volI);
+    weeks[w - 1].actualRir = rirCount > 0 ? round(rirSum / rirCount) : null;
   }
 
   return {

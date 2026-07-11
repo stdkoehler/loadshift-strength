@@ -20,6 +20,8 @@ const LABELS: Record<string, string> = {
   actualTop: 'Actual',
   volumeTarget: 'Target',
   volumeActual: 'Actual',
+  targetRir: 'Target',
+  actualRir: 'Actual',
 };
 
 const tooltipContentStyle = {
