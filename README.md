@@ -105,6 +105,9 @@ target folder (e.g. `/volume1/docker/loadshift-strength`) already exists on a sh
 
 ### Initial setup
 
+Connect to NAS via `ssh <nas-user>@<nas-ip>`. Ideally, use WSL bash for that.
+Root rights are required for docker: `sudo -i`. 
+
 1. **Create the target folder** on the NAS:
    ```bash
    ssh <nas-user>@<nas-ip> "mkdir -p /volume1/docker/loadshift-strength"
