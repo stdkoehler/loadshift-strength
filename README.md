@@ -96,3 +96,126 @@ Serves on `http://<host>:8090`, gated by HTTP Basic Auth (`APP_USER`/`APP_PASSWO
 
 Note: `better-sqlite3` has no prebuilt musl binary for Alpine, so the build stage compiles it from source
 (`python3 make g++` installed just for that stage — the runtime image stays slim).
+
+## Deploying to a Synology NAS
+
+Requires SSH access to the NAS (**Control Panel → Terminal & SNMP → Enable SSH service**) and Docker/Container
+Manager installed. Commands below assume the NAS is reachable at `<nas-ip>` with user `<nas-user>`, and that a
+target folder (e.g. `/volume1/docker/loadshift-strength`) already exists on a shared volume.
+
+### Initial setup
+
+1. **Create the target folder** on the NAS:
+   ```bash
+   ssh <nas-user>@<nas-ip> "mkdir -p /volume1/docker/loadshift-strength"
+   ```
+
+2. **Copy the project code** from your dev machine, excluding build artifacts, secrets, and local data
+   (the database is transferred separately in the next step — see the warning below):
+   ```bash
+   tar --exclude='node_modules' --exclude='.next' --exclude='.git' --exclude='data' \
+       --exclude='.env' --exclude='.env.local' -cf - . \
+     | ssh <nas-user>@<nas-ip> "tar -xf - -C /volume1/docker/loadshift-strength"
+   ```
+   > **Don't** try to add `data/workout.sqlite` back into this same `tar` command with a second path
+   > argument — GNU tar's `--exclude='data'` matches that path too and silently drops it, even though
+   > it's named explicitly. Copy the database as its own step instead (next).
+
+3. **Copy the database**, if you're migrating existing data (skip this for a brand-new install — the
+   container will seed a default plan on first boot if no database is present):
+   ```bash
+   ssh <nas-user>@<nas-ip> "mkdir -p /volume1/docker/loadshift-strength/data"
+   scp -O data/workout.sqlite <nas-user>@<nas-ip>:/volume1/docker/loadshift-strength/data/workout.sqlite
+   ```
+   (`-O` forces the legacy SCP protocol — Synology's `sshd` often doesn't support the SFTP subsystem
+   modern `scp` tries by default, and fails with "subsystem request failed".)
+
+4. **Create `.env`** directly on the NAS (keeps credentials off the wire from your dev machine):
+   ```bash
+   ssh <nas-user>@<nas-ip>
+   cd /volume1/docker/loadshift-strength
+   cat > .env << 'EOF'
+   APP_USER=yourusername
+   APP_PASSWORD=yourpassword
+   EOF
+   ```
+
+5. **Build and start** the container:
+   ```bash
+   sudo docker compose up -d --build
+   ```
+   Serves on `http://<nas-ip>:8090`. If `docker` commands need `sudo` because your user isn't in the
+   `docker`/`administrators` group, either add it (DSM: **Control Panel → User & Group**) and reconnect,
+   or keep using `sudo`.
+
+### Updating (without losing the database)
+
+The database lives in `./data` on the NAS, bind-mounted into the container — as long as you never
+overwrite that folder, redeploying new code leaves it untouched.
+
+1. **Push the updated code**, same exclude list as initial setup (this leaves `data/` on the NAS alone
+   since it's never included as a source):
+   ```bash
+   tar --exclude='node_modules' --exclude='.next' --exclude='.git' --exclude='data' \
+       --exclude='.env' --exclude='.env.local' -cf - . \
+     | ssh <nas-user>@<nas-ip> "tar -xf - -C /volume1/docker/loadshift-strength"
+   ```
+
+2. **Rebuild and restart**:
+   ```bash
+   ssh <nas-user>@<nas-ip>
+   cd /volume1/docker/loadshift-strength
+   sudo docker compose up -d --build
+   ```
+   `migrate.cjs` runs automatically on container start and applies any new Drizzle migrations against the
+   existing `data/workout.sqlite` — it only seeds a default plan when the `cycles` table is empty, so
+   existing data is left as-is.
+
+3. **Verify** the app still shows your data at `http://<nas-ip>:8090` after the restart.
+
+### Updating after a schema change
+
+Schema changes are just another kind of code update — `drizzle/` (the migration files) ships in the same
+`tar` transfer as everything else, and `migrate.cjs` applies whatever's pending against the existing
+`data/workout.sqlite` on container start. The key rule: **generate the migration on the dev machine first,
+never edit the schema directly on the NAS.**
+
+1. **On the dev machine**, after changing `src/db/schema.ts`, generate the migration and apply it locally
+   to make sure it runs cleanly before it ever touches the NAS's real data:
+   ```bash
+   npx drizzle-kit generate     # writes a new .sql file into drizzle/
+   npm run db:migrate           # applies it to your local ./data/workout.sqlite
+   ```
+   Confirm the app still works locally and your local data survived. Commit the new migration file.
+
+2. **Back up the NAS database** before deploying, in case the migration turns out to be destructive
+   (SQLite can't do every `ALTER TABLE` in place, so Drizzle sometimes generates a
+   create-new-table/copy-rows/drop-old-table sequence — safe in the common case, but worth a safety net):
+   ```bash
+   ssh <nas-user>@<nas-ip> "cp /volume1/docker/loadshift-strength/data/workout.sqlite \
+     /volume1/docker/loadshift-strength/data/workout.sqlite.bak-$(date +%Y%m%d%H%M)"
+   ```
+
+3. **Push the code** (same as a normal update — `drizzle/` is included since it's not in the exclude list,
+   `data/` still isn't a tar source):
+   ```bash
+   tar --exclude='node_modules' --exclude='.next' --exclude='.git' --exclude='data' \
+       --exclude='.env' --exclude='.env.local' -cf - . \
+     | ssh <nas-user>@<nas-ip> "tar -xf - -C /volume1/docker/loadshift-strength"
+   ```
+
+4. **Rebuild and restart**:
+   ```bash
+   ssh <nas-user>@<nas-ip>
+   cd /volume1/docker/loadshift-strength
+   sudo docker compose up -d --build
+   ```
+
+5. **Check the logs** for the migration step specifically, and verify the app shows your existing data
+   plus the new schema:
+   ```bash
+   sudo docker compose logs -f
+   ```
+   Look for `Migrations applied.` without errors. If something went wrong, restore the backup from step 2
+   (`cp` it back over `data/workout.sqlite`, then `sudo docker compose up -d --build` again) and investigate
+   locally before retrying.
