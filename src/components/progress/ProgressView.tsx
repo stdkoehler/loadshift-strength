@@ -5,20 +5,35 @@ import { useProgress, useProgressList } from '@/query/hooks/useProgress';
 import { usePlan } from '@/query/hooks/usePlan';
 import { LineChart, BarChart } from './Charts';
 import { PlanOverview } from './PlanOverview';
-import { Dropdown } from '@/components/ui/Dropdown';
 
 const TARGET_COLOR = '#a78bfa';
 const ACTUAL_COLOR = '#34d399';
+const WD: Record<number, string> = { 1: 'Mon', 2: 'Tue', 3: 'Wed', 4: 'Thu', 5: 'Fri', 6: 'Sat', 7: 'Sun' };
 
 export function ProgressView() {
   const { data: list } = useProgressList();
+  const [weekday, setWeekday] = useState<number | undefined>(undefined);
   const [exerciseId, setExerciseId] = useState<number | undefined>(undefined);
   const { data } = useProgress(exerciseId);
   const { data: plan } = usePlan(list?.cycle?.id);
 
+  // Days in plan order (as returned by the API), deduped by weekday - day *names* can repeat
+  // (e.g. two "Legs" days in one week), so weekday is the only safe grouping key.
+  const days = list
+    ? Array.from(new Map(list.exercises.map((e) => [e.weekday, { weekday: e.weekday, name: e.day }])).values())
+    : [];
+  const dayExercises = list ? list.exercises.filter((e) => e.weekday === weekday) : [];
+
   useEffect(() => {
-    if (exerciseId == null && list?.exercises?.length) setExerciseId(list.exercises[0].id);
-  }, [list, exerciseId]);
+    if (weekday == null && days.length) setWeekday(days[0].weekday);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [list]);
+
+  useEffect(() => {
+    if (!dayExercises.length) return;
+    if (!dayExercises.some((e) => e.id === exerciseId)) setExerciseId(dayExercises[0].id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [weekday, list]);
 
   if (!list) return <p className="px-4 py-6 text-sm text-neutral-500">Loading...</p>;
   if (!list.exercises.length) return <p className="px-4 py-6 text-sm text-neutral-500">No exercises in the active cycle.</p>;
@@ -32,12 +47,39 @@ export function ProgressView() {
 
       <div>
         <div className="text-xs uppercase tracking-wide text-neutral-500">Progress</div>
-        <div className="mt-2">
-          <Dropdown
-            options={list.exercises.map((it) => ({ value: it.id, label: `${it.day} · ${it.name}` }))}
-            value={exerciseId}
-            onChange={setExerciseId}
-          />
+
+        <div className="app-scroll-x -mx-1 mt-2 flex gap-2 overflow-x-auto px-1 pb-1">
+          {days.map((d) => (
+            <button
+              key={d.weekday}
+              type="button"
+              onClick={() => setWeekday(d.weekday)}
+              className={`shrink-0 rounded-full border px-3.5 py-2 text-xs font-medium transition-colors ${
+                d.weekday === weekday
+                  ? 'border-emerald-500/60 bg-emerald-500/15 text-emerald-300'
+                  : 'border-neutral-800 bg-neutral-900 text-neutral-400 hover:border-neutral-600'
+              }`}
+            >
+              {WD[d.weekday]} · {d.name}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-2 flex flex-col gap-1.5">
+          {dayExercises.map((ex) => (
+            <button
+              key={ex.id}
+              type="button"
+              onClick={() => setExerciseId(ex.id)}
+              className={`rounded-lg border px-3 py-2.5 text-left text-sm transition-colors ${
+                ex.id === exerciseId
+                  ? 'border-emerald-500/60 bg-emerald-500/10 text-neutral-100'
+                  : 'border-neutral-800 bg-neutral-900/60 text-neutral-300 hover:border-neutral-700'
+              }`}
+            >
+              {ex.name}
+            </button>
+          ))}
         </div>
       </div>
 

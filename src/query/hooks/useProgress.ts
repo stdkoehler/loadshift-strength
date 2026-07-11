@@ -9,6 +9,7 @@ export interface ProgressListItem {
   id: number;
   name: string;
   day: string;
+  weekday: number;
 }
 export interface ProgressListResponse {
   cycle: Cycle;

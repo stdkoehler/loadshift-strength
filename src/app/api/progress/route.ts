@@ -14,7 +14,9 @@ export async function GET(request: NextRequest) {
   const exerciseIdParam = request.nextUrl.searchParams.get('exercise_id');
   if (!exerciseIdParam) {
     const plan = await getFullPlan(cycle.id);
-    const items = (plan?.days ?? []).flatMap((d) => d.exercises.map((e) => ({ id: e.id, name: e.name, day: d.name })));
+    const items = (plan?.days ?? []).flatMap((d) =>
+      d.exercises.map((e) => ({ id: e.id, name: e.name, day: d.name, weekday: d.weekday }))
+    );
     return NextResponse.json({ cycle, exercises: items });
   }
 
