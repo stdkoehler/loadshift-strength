@@ -1,5 +1,6 @@
 services:
   workout-next:
+    image: loadshift-strength:latest
     build: .
     ports: ["8090:3000"]
     environment:
