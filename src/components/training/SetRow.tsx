@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { upsertLogAction } from '@/server/actions/logs.actions';
 import { queryKeys } from '@/query/keys';
-import { fmt, todayIso } from '@/lib/date';
+import { fmt, restrictLoggingToToday, todayIso } from '@/lib/date';
 import { toggleDone } from './toggle-done';
 import type { SessionSet } from '@/lib/types';
 
@@ -26,7 +26,7 @@ function RoleChip({ role }: { role: string | null }) {
 
 export function SetRow({ exerciseId, date, set }: { exerciseId: number; date: string; set: SessionSet }) {
   const queryClient = useQueryClient();
-  const editable = date === todayIso();
+  const editable = !restrictLoggingToToday() || date === todayIso();
   const [reps, setReps] = useState(set.actualReps != null ? String(set.actualReps) : '');
   const [weight, setWeight] = useState(set.actualWeight != null ? String(set.actualWeight) : '');
   const [rir, setRir] = useState(set.actualRir != null ? String(set.actualRir) : '');

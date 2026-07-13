@@ -6,12 +6,12 @@ import { exercises, logs, sets } from '@/db/schema';
 import { getActiveCycle, getPhases } from '@/server/queries/cycles';
 import { computeTarget, weekNumberFor } from '@/lib/progression';
 import type { ProgressionType } from '@/lib/progression';
-import { todayIso } from '@/lib/date';
+import { restrictLoggingToToday, todayIso } from '@/lib/date';
 import { logInputSchema } from '@/zod/log.schema';
 
 export async function upsertLogAction(input: unknown) {
   const data = logInputSchema.parse(input);
-  if (data.logDate !== todayIso()) {
+  if (restrictLoggingToToday() && data.logDate !== todayIso()) {
     throw new Error('Only the current day can be logged.');
   }
 

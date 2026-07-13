@@ -2,6 +2,7 @@ import { ROLES, type CustomRow, type EditorState } from './types';
 import { inputClass, labelClass } from './styles';
 import { SortableList, SortableItem, DragHandle } from '@/components/ui/SortableList';
 import { Dropdown } from '@/components/ui/Dropdown';
+import { genId } from '@/lib/id';
 
 const ROLE_OPTIONS = [{ value: '', label: '— no role —' }, ...ROLES.filter(Boolean).map((r) => ({ value: r, label: r }))];
 
@@ -13,7 +14,7 @@ export function RampNonPhased({ st, patch }: { st: EditorState; patch: (p: Parti
   const removeRow = (key: string) => patch({ custom: st.custom.filter((c) => c._key !== key) });
   const addRow = () => {
     const last = st.custom[st.custom.length - 1] || { reps: 10, weight: 20, role: '', rir: '' };
-    patch({ custom: [...st.custom, { _key: crypto.randomUUID(), reps: last.reps, weight: last.weight, role: '', rir: last.rir }] });
+    patch({ custom: [...st.custom, { _key: genId(), reps: last.reps, weight: last.weight, role: '', rir: last.rir }] });
   };
 
   return (

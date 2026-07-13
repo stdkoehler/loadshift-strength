@@ -5,6 +5,14 @@ export function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+// Whether Training only allows logging/checking off today's sets (the historical default).
+// Set NEXT_PUBLIC_RESTRICT_LOGGING_TO_TODAY=false to allow editing any date - useful for demos,
+// backfilling missed sessions, or local testing. NEXT_PUBLIC_ so both the server action and the
+// client component read the same value.
+export function restrictLoggingToToday(): boolean {
+  return process.env.NEXT_PUBLIC_RESTRICT_LOGGING_TO_TODAY !== 'false';
+}
+
 export function addDays(iso: string, n: number): string {
   const d = new Date(iso + 'T00:00:00Z');
   d.setUTCDate(d.getUTCDate() + n);

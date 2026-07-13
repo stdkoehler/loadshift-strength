@@ -1,4 +1,5 @@
 import type { ExerciseWithSets, Phase } from '@/lib/types';
+import { genId } from '@/lib/id';
 import type { EditorState, PhaseVal } from './types';
 
 function emptyPhaseVals(phases: Phase[], reps = 10, weight = 20, rir: number | string = ''): Record<number, PhaseVal> {
@@ -20,9 +21,9 @@ export function deriveState(initial: ExerciseWithSets | null, phases: Phase[]): 
       structure: 'uniform',
       activePhase: phases[0]?.id ?? null,
       uniform: { numSets: 3, reps: 10, weight: 20, increment: 1.25, rir: '' },
-      custom: [{ _key: crypto.randomUUID(), reps: 10, weight: 20, role: '', rir: '' }],
+      custom: [{ _key: genId(), reps: 10, weight: 20, role: '', rir: '' }],
       phaseVals: emptyPhaseVals(phases),
-      customPhase: [{ _key: crypto.randomUUID(), role: '', vals: emptyPhaseVals(phases) }],
+      customPhase: [{ _key: genId(), role: '', vals: emptyPhaseVals(phases) }],
       repeatIncrement: '',
     };
   }
@@ -46,7 +47,7 @@ export function deriveState(initial: ExerciseWithSets | null, phases: Phase[]): 
       rir: firstT?.targetRir ?? '',
     },
     custom: sets.map((s) => ({
-      _key: crypto.randomUUID(),
+      _key: genId(),
       reps: s.targets?.[0]?.reps ?? '',
       weight: s.targets?.[0]?.baseWeight ?? '',
       role: s.role || '',
@@ -61,7 +62,7 @@ export function deriveState(initial: ExerciseWithSets | null, phases: Phase[]): 
     customPhase: sets.map((s) => {
       const plain = s.targets?.find((x) => x.phaseId == null);
       return {
-        _key: crypto.randomUUID(),
+        _key: genId(),
         role: s.role || '',
         vals: Object.fromEntries(
           phases.map((p) => {
@@ -109,8 +110,8 @@ export function deriveState(initial: ExerciseWithSets | null, phases: Phase[]): 
     }
   }
   base.structure = uniform ? 'uniform' : 'custom';
-  if (!base.custom.length) base.custom = [{ _key: crypto.randomUUID(), reps: 10, weight: 20, role: '', rir: '' }];
-  if (!base.customPhase.length) base.customPhase = [{ _key: crypto.randomUUID(), role: '', vals: emptyPhaseVals(phases) }];
+  if (!base.custom.length) base.custom = [{ _key: genId(), reps: 10, weight: 20, role: '', rir: '' }];
+  if (!base.customPhase.length) base.customPhase = [{ _key: genId(), role: '', vals: emptyPhaseVals(phases) }];
   return base;
 }
 

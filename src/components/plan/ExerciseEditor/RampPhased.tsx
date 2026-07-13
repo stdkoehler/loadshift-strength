@@ -4,6 +4,7 @@ import { emptyPhaseVals } from './deriveState';
 import { hintClass, inputClass, labelClass } from './styles';
 import { SortableList, SortableItem, DragHandle } from '@/components/ui/SortableList';
 import { Dropdown } from '@/components/ui/Dropdown';
+import { genId } from '@/lib/id';
 
 const ROLE_OPTIONS = [{ value: '', label: '— no role —' }, ...ROLES.filter(Boolean).map((r) => ({ value: r, label: r }))];
 
@@ -36,7 +37,7 @@ export function RampPhased({
   const addRow = () => {
     const last = st.customPhase[st.customPhase.length - 1];
     const vals = last ? JSON.parse(JSON.stringify(last.vals)) : emptyPhaseVals(phases);
-    patch({ customPhase: [...st.customPhase, { _key: crypto.randomUUID(), role: '', vals }] });
+    patch({ customPhase: [...st.customPhase, { _key: genId(), role: '', vals }] });
   };
 
   return (

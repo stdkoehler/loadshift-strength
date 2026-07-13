@@ -24,6 +24,12 @@
       "command": "npm run dev -- --inspect"
     },
     {
+      "name": "Demo server (isolated data-demo DB, port 3001)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "node scripts/dev-demo.mjs"
+    },
+    {
       "name": "Next.js: debug client-side (Edge)",
       "type": "msedge",
       "request": "launch",
